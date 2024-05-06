@@ -5,7 +5,7 @@ using UIhub.Models;
 
 namespace UIhub.Data
 {
-    public class ApplicationDbContext : IdentityDbContext
+    public class ApplicationDbContext : IdentityDbContext<User>
     {
         public DbSet<Post> Posts { get; set; }
         public DbSet<PostReply> PostTextReplies { get; set; }
@@ -33,29 +33,31 @@ namespace UIhub.Data
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
-            builder.Entity<IdentityRole>().HasData(new IdentityRole
-            {
-                Id = "1ba64fb1-faf0-424f-8a66-af45363d4c58",
-                Name = "admin",
-                NormalizedName = "ADMIN"
-            });
+            //builder.Entity<IdentityRole>().HasData(new IdentityRole
+            //{
+            //    Id = "1ba64fb1-faf0-424f-8a66-af45363d4c58",
+            //    Name = "admin",
+            //    NormalizedName = "ADMIN"
+            //});
 
-            builder.Entity<User>().HasData(new User
-            {
-                Id = "8ff7a4c5-33b3-4332-a4d4-979ba86ec589",
-                UserName = "NagibatoSs",
-                NormalizedUserName = "NAGIBATOSS",
-                Email = "zhuravleva_02@mail.ru",
-                EmailConfirmed = true,
-                PasswordHash = new PasswordHasher<User>().HashPassword(null,"kjifhfdjljgkfdf.ott"),
-                SecurityStamp = string.Empty
-            });
+            //builder.Entity<User>().HasData(new User
+            //{
+            //    Id = "8ff7a4c5-33b3-4332-a4d4-979ba86ec589",
+            //    UserName = "NagibatoSs",
+            //    NormalizedUserName = "NAGIBATOSS",
+            //    Email = "zhuravleva_02@mail.ru",
+            //    EmailConfirmed = true,
+            //    PasswordHash = new PasswordHasher<User>().HashPassword(null, "kjifhfdjljgkfdf.ott"),
+            //    SecurityStamp = string.Empty,
+            //    Reputation = 0,
+            //    Points = 0
+            //});
 
-            builder.Entity<IdentityUserRole<string>>().HasData(new IdentityUserRole<string>
-            {
-                RoleId = "1ba64fb1-faf0-424f-8a66-af45363d4c58",
-                UserId = "8ff7a4c5-33b3-4332-a4d4-979ba86ec589"
-            });
+            //builder.Entity<IdentityUserRole<string>>().HasData(new IdentityUserRole<string>
+            //{
+            //    RoleId = "1ba64fb1-faf0-424f-8a66-af45363d4c58",
+            //    UserId = "8ff7a4c5-33b3-4332-a4d4-979ba86ec589"
+            //});
         }
     }
 }

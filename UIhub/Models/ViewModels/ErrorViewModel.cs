@@ -1,4 +1,4 @@
-namespace UIhub.Models.ViewModels
+namespace UIhub.Models
 {
     public class ErrorViewModel
     {
