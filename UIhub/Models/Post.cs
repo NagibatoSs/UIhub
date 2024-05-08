@@ -9,7 +9,7 @@
         public int Views { get; set; }
         public int EstimateCount { get; set; }
         public bool IsTop { get; set; }
-        public AutoAssessmentResult AutoAssessment { get; set; }
+        public AutoAssessmentResult? AutoAssessment { get; set; }
         public virtual List<InterfaceLayout> InterfaceLayouts { get; set; }
         public virtual List<PostReply> Replies { get; set; }
         public virtual List<Estimate> Estimates { get; set; }

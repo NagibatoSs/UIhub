@@ -1,0 +1,73 @@
+﻿@model UIhub.Models.ViewModels.PostContentViewModel
+<h1>@Model.PostViewModel.Title</h1>
+<h3>@Model.PostViewModel.Description</h3>
+<p>Дата создания: @Model.PostViewModel.Created</p>
+<p>Создал: @Model.PostViewModel.Author.UserName</p>
+<p>Просмотров: @Model.PostViewModel.Views</p>
+<p>Оценок: @Model.PostViewModel.EstimateCount</p>
+@if (Model.PostViewModel.InterfaceLayouts.Any())
+{
+    <table class="table table-hover" id="postIndexTable">
+        <tbody>
+            @foreach (var layout in Model.PostViewModel.InterfaceLayouts)
+            {
+                <tr>
+                    <td>
+                        @Html.Raw(layout.SourceUrl)
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+@* @if (Model.PostViewModel.Author.Id ==  //ранво айди текущего юзера) *@
+@if (Model.PostViewModel.Estimates.Any())
+{
+    <p>Тут результаты эстимейтс</p>
+}
+@if (Model.PostViewModel.AutoAssessment != null)
+{
+    <p>Автоматическая оценка</p>
+    <p>Итоговая оценка: @Model.PostViewModel.AutoAssessment.ResultValue</p>
+    <p>@Model.PostViewModel.AutoAssessment.ResultText</p>
+}
+<form asp-controller="PostReply" asp-action="AddReply" method="post">
+    <div class="form-group">
+        <label asp-for="NewReplyModel.Content">Ответ:</label>
+        <textarea asp-for="NewReplyModel.Content" class="form-control"></textarea>
+    </div>
+    <input asp-for="Id" type="hidden" value="@Model.Id" />
+    <button type="submit" id="submitPostBtn" class="btn btn-submitPost">
+        Отправить ответ
+    </button>
+</form>
+@* конец ифа *@
+
+@if (Model.PostViewModel.Replies.Any())
+{
+    <table class="table table-hover">
+        <tbody>
+            @foreach (var reply in Model.PostViewModel.Replies)
+            {
+                <tr>
+                    <td>
+                        <a>@reply.Author.UserName</a>
+                    </td>
+                    <td>
+                        @reply.Content
+                    </td>
+                    <td>
+                        @reply.Created
+                    </td>
+                    <td>
+                        <p>Лайки: </p>@reply.LikesCount
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>Ответов пользователей пока нет(</p>
+}

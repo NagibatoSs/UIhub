@@ -1,0 +1,60 @@
+﻿@model UIhub.Models.ViewModels.MainPageViewModel
+<a asp-controller="Post" asp-action="CreateNewPost">
+    Создать публикацию
+</a>
+<h1>Топ публикаций</h1>
+<table class="table table-hover" id="postIndexTable">
+    <tbody>
+        @foreach (var post in Model.Posts)
+        {
+            @if (post.isTop)
+            {
+                <tr>
+                    <td>
+                    <a asp-controller="Post" asp-action="OpenPostById" asp-route-id="@post.Id">
+                        @post.Title
+                    </a>
+                    <p>Просмотров:  @post.Views</p>
+                </td>
+                <td>
+                    @post.Created
+                </td>
+                <td>
+                    @post.AuthorName
+                </td>
+                <td>
+                    <p>Оценок:  @post.EstimateCount</p>
+                </td>
+            </tr>
+            }
+        }
+    </tbody>
+</table>
+<h3>Остальные публикации</h3>
+<table class="table table-hover" id="postIndexTable">
+    <tbody>
+        @foreach (var post in Model.Posts)
+        {
+            @if (!post.isTop)
+            {
+                <tr>
+                    <td>
+                        <a asp-controller="Post" asp-action="OpenPostById" asp-route-id="@post.Id">
+                            @post.Title
+                        </a>
+                        <p>Просмотров:  @post.Views</p>
+                    </td>
+                    <td>
+                        @post.Created
+                    </td>
+                    <td>
+                        @post.AuthorName
+                    </td>
+                    <td>
+                        <p>Оценок:  @post.EstimateCount</p>
+                    </td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>
