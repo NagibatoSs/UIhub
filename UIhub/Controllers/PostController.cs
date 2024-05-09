@@ -3,6 +3,7 @@ using UIhub.Data;
 using UIhub.Models;
 using UIhub.Models.ViewModels;
 using Microsoft.AspNetCore.Identity;
+using System.Reflection.PortableExecutable;
 
 namespace UIhub.Controllers
 {
@@ -92,12 +93,40 @@ namespace UIhub.Controllers
             };
 
             //Estimates = new List<Estimate>(),
-            
-
-            foreach (var content in model.InterfaceLayoutsSrc)
+            if (model.InterfaceLayoutsSrc != null)
             {
-                var layoutSrc = new InterfaceLayout() { SourceUrl = content };
-                post.InterfaceLayouts.Add(layoutSrc);
+                foreach (var content in model.InterfaceLayoutsSrc)
+                {
+                    var layoutSrc = new InterfaceLayout() { SourceUrl = content };
+                    post.InterfaceLayouts.Add(layoutSrc);
+                }
+            }
+            if (model.EstimateFormat == "scale")
+            {
+                foreach (var estimate in model.EstimatesScale)
+                {
+                    if (estimate.Characteristic == null) continue;
+                    var scale = new EstimateScale { Characteristic = estimate.Characteristic,
+                        Count_1 =0, Count_2 =0, Count_3 = 0, Count_4=0, Count_5=0};
+                    post.Estimates.Add(scale);
+                }
+            }
+            if (model.EstimateFormat == "voting")
+            {
+                foreach (var estimate in model.EstimatesVoting)
+                {
+                    if (estimate.VotingObjects == null) continue;
+                    var voting = new EstimateVoting
+                    {
+                        Characteristic = estimate.Characteristic,
+                    };
+                    voting.VotingObjects = new List<VotingObject>();
+                    foreach (var obj in estimate.VotingObjects)
+                    {
+                        voting.VotingObjects.Add(obj);
+                    }
+                    post.Estimates.Add(voting);
+                }
             }
             return post;
         }

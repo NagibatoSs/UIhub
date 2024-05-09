@@ -10,7 +10,10 @@
         public bool IsTop { get; set; }
         public AutoAssessmentResult AutoAssessment { get; set; }
         public List<string> InterfaceLayoutsSrc { get; set; }
-        public List<Estimate> Estimates { get; set; }
+        public List<EstimateScale> EstimatesScale { get; set; }
+        public List<EstimateVoting> EstimatesVoting { get; set; }
+        public List<EstimateRanging> EstimatesRanging { get; set; }
+        public string EstimateFormat { get; set; }
         public User Author { get; set; }
     }
 }
