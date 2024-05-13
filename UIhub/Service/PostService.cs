@@ -5,7 +5,7 @@ using UIhub.Data;
 using UIhub.Models;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
-namespace UIXtimate.Service
+namespace UIhub.Service
 {
     public class PostService : IPost
     {
@@ -29,6 +29,7 @@ namespace UIXtimate.Service
                 .Include(post => post.Replies)
                    .ThenInclude(r => r.Author)
                 .Include(post => post.Author)
+                    .ThenInclude(a => a.Rank)
                 .Include(post => post.InterfaceLayouts)
                 .Include(post => post.AutoAssessment)
                 .Include(post => post.Estimates);

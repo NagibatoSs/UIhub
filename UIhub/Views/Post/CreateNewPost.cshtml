@@ -44,68 +44,10 @@
                     <input type="text" class="form-control" id="EstimatesScale[0]" asp-for="EstimatesScale[0].Characteristic" placeholder="Характеристика"/>
             </div>
         </div>
-@* 
-        <div id="formatContent1" class="row">
-            <div class="col-auto">
-                <p>Добавить голосование</p>
-            </div>
-            <div class="col-auto">
-                <button type="button" onclick="newVoting()">+</button>
-            </div>
-
-            <div class="row">
-
-                <div class="col-auto">
-                    <input type="text" id="Estimates[0]" asp-for="EstimatesVoting[0].Characteristic" placeholder="Характеристика" />
-                </div>
-
-                <div class="col-auto">
-                    <p>Добавить вариант ответа</p>
-                </div>
-
-                <div class="col-auto">
-                    <button type="button" onclick="newVoteVariant()">+</button>
-                </div>
-
-            </div>
-
-            <div class="form-group">
-                <input class="form-control" type="text" id="Estimates[0]" asp-for="EstimatesVoting[0].VotingObjects[0].Content" placeholder="Вариант ответа" />
-                <input class="form-control" type="text" id="Estimates[0]" asp-for="EstimatesVoting[0].VotingObjects[1].Content" placeholder="Вариант ответа" />
-            </div>
-        </div> *@
-
-@* 
-        <div id="formatContent2" class="row">
-            <div class="col-auto">
-                <p>Добавить ранжирование</p>
-            </div>
-            <div class="col-auto">
-                <button type="button" onclick="newEstimateFields()">+</button>
-            </div>
-            <div class="row">
-                <div class="col-auto">
-                    <input type="text" id="Estimates[0]" asp-for="Estimates[0].Characteristic" placeholder="Характеристика" />
-                </div>
-                <div class="col-auto">
-                    <button type="button" onclick="newEstimateFields()">+</button>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-auto">
-                    <input type="text" id="Estimates[0]" asp-for="Estimates[0].Characteristic" placeholder="Объект ранжирования" />
-                </div>
-                <div class="col-auto">
-                    <input type="text" id="Estimates[0]" asp-for="Estimates[0].Characteristic" placeholder="Объект ранжирования" />
-                </div>
-                <div class="col-auto">
-                    <input type="text" id="Estimates[0]" asp-for="Estimates[0].Characteristic" placeholder="Объект ранжирования" />
-                </div>
-            </div>
-        </div> *@
-
-    </div>
-
+        <div class="row">
+            <p>Вывести в топ</p>
+            <input type="checkbox" asp-for="IsTop">
+        </div>
     <button type="submit" class="btn-primary">
         Разместить
     </button>

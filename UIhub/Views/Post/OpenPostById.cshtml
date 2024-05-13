@@ -20,18 +20,41 @@
         </tbody>
     </table>
 }
-@* @if (Model.PostViewModel.Author.Id ==  //ранво айди текущего юзера) *@
-@if (Model.PostViewModel.Estimates.Any())
+@* @if (Model.CurrentUserId!= null && Model.PostViewModel.Author.Id == Model.CurrentUserId) *@
+@* { *@
+
+    @if (Model.PostViewModel.Estimates.Any())
+    {
+        <p>Тут результаты эстимейтс scale</p>
+    }
+    @if (Model.PostViewModel.AutoAssessment != null)
+    {
+        <p>Автоматическая оценка</p>
+        <p>Итоговая оценка: @Model.PostViewModel.AutoAssessment.ResultValue</p>
+        <p>@Model.PostViewModel.AutoAssessment.ResultText</p>
+    }
+@* } *@
+@* else *@
+@* { *@
+@* @if (Model.PostViewModel.EstimatesScale != null)
 {
-    <p>Тут результаты эстимейтс</p>
-}
-@if (Model.PostViewModel.AutoAssessment != null)
-{
-    <p>Автоматическая оценка</p>
-    <p>Итоговая оценка: @Model.PostViewModel.AutoAssessment.ResultValue</p>
-    <p>@Model.PostViewModel.AutoAssessment.ResultText</p>
-}
-<form asp-controller="PostReply" asp-action="AddReply" method="post">
+    <form asp-controller="Post" asp-action="SetScaleEstimate" method="post">
+    @for (int i=0;i<Model.PostViewModel.EstimatesScale.Count;i++)
+    {
+        <p>@Model.PostViewModel.EstimatesScale[i].Characteristic</p>
+        <input type="radio" id="1" value="select 1" name="scaleEst" onclick="selectRadio(this.id)" />
+        <input type="radio" id="2" value="select 2" name="scaleEst" onclick="selectRadio(this.id)" />
+        <input type="radio" id="3" value="select 3" name="scaleEst" onclick="selectRadio(this.id)" />
+        <input type="radio" id="4" value="select 4" name="scaleEst" onclick="selectRadio(this.id)" />
+        <input type="radio" id="5" value="select 5" name="scaleEst" onclick="selectRadio(this.id)" />
+        <input asp-for="InputsEstimatesScale[i]" type="hidden" value="" id="scaleResult"/>
+    }
+    <button type="submit">Отправить оценку</button>
+    </form>
+} *@
+@* } *@
+
+<form asp-controller="PostReply" asp-action="PlaceReply" method="post">
     <div class="form-group">
         <label asp-for="NewReplyModel.Content">Ответ:</label>
         <textarea asp-for="NewReplyModel.Content" class="form-control"></textarea>
@@ -41,7 +64,6 @@
         Отправить ответ
     </button>
 </form>
-@* конец ифа *@
 
 @if (Model.PostViewModel.Replies.Any())
 {
@@ -52,6 +74,10 @@
                 <tr>
                     <td>
                         <a>@reply.Author.UserName</a>
+                    </td>
+                    <td>
+                        @reply.Author.Rank.Name
+                        Репутация: @reply.Author.Reputation
                     </td>
                     <td>
                         @reply.Content

@@ -56,6 +56,7 @@ function newEstimateFields(button_id) {
 
 function newScaleFields() {
     let container = document.getElementById("formatContent");
+
     container.innerHTML = '<div class="col-auto"> <p>Добавить шкалу</p> </div>'
     container.innerHTML += '<div class="col-auto"> <button type="button" id="newScaleBtn" onclick="newScale()">+</button> </div>' 
 
@@ -72,6 +73,9 @@ function newScaleFields() {
     field.setAttribute("asp-for", "EstimatesScale[0].Characteristic");
     div.appendChild(field);
     container.appendChild(div);
+}
+function printSmt(data) {
+    console.log(data);
 }
 
 function newScale() {
@@ -105,33 +109,21 @@ function newVotingFields() {
     let divBlock = document.createElement("div");
     divBlock.setAttribute("id", "block0");
 
-    let divRow = document.createElement("div");
-    divRow.setAttribute("class", "row");
-
-    let divCol = document.createElement("div");
-    divCol.setAttribute("class", "col-auto");
-    let field = document.createElement("input");
-    field.setAttribute("class", "form-control vote");
-    field.setAttribute("id", "EstimatesVoting[0]");
-    field.setAttribute("name", "EstimatesVoting[0].Characteristic");
-    field.setAttribute("type", "text");
-    field.setAttribute("placeholder", "Характеристика");
-    field.setAttribute("asp-for", "EstimatesVoting[0].Characteristic");
+    let divRow = createDiv("row")
+    let divCol = createDiv("col-auto")
+    let field = createTextInput("EstimatesVoting[0].Characteristic", "Характеристика", "form-control vote")
     divCol.appendChild(field);
     divRow.appendChild(divCol);
     divBlock.appendChild(divRow);
 
-    divCol = document.createElement("div");
-    divCol.setAttribute("class", "col-auto");
+    divCol = createDiv("col-auto")
     field = document.createElement("p");
     field.innerHTML = "<p>Добавить вариант ответа</p>";
     divCol.appendChild(field);
     divRow.appendChild(divCol);
     divBlock.appendChild(divRow);
 
-
-    divCol = document.createElement("div");
-    divCol.setAttribute("class", "col-auto addBtn");
+    divCol = createDiv("col-auto addBtn")
     field = document.createElement("button");
     field.setAttribute("type", "button");
     field.innerHTML = "+";
@@ -140,50 +132,44 @@ function newVotingFields() {
     divRow.appendChild(divCol);
     divBlock.appendChild(divRow);
 
-
-    let div = document.createElement("div");
-    div.setAttribute("class", "form-group");
-    field = document.createElement("input");
-    field.setAttribute("class", "form-control voteObj");
-    field.setAttribute("id", "EstimatesVoting[0].VotingObjects[0]");
-    field.setAttribute("name", "EstimatesVoting[0].VotingObjects[0].Content");
-    field.setAttribute("type", "text");
-    field.setAttribute("placeholder", "Вариант ответа");
-    field.setAttribute("asp-for", "EstimatesVoting[0].VotingObjects[0].Content");
+    field = createTextInput("EstimatesVoting[0].VotingObjects[0].Content", "Вариант ответа", "form-control voteObj");
+    div = createDiv("form-group");
     div.appendChild(field);
     divBlock.appendChild(div);
 
-    div = document.createElement("div");
-    div.setAttribute("class", "form-group");
-    field = document.createElement("input");
-    field.setAttribute("class", "form-control voteObj");
-    field.setAttribute("id", "EstimatesVoting[0].VotingObjects[1]");
-    field.setAttribute("name", "EstimatesVoting[0].VotingObjects[1].Content");
-    field.setAttribute("type", "text");
-    field.setAttribute("placeholder", "Вариант ответа");
-    field.setAttribute("asp-for", "EstimatesVoting[0].VotingObjects[1].Content");
+    field = createTextInput("EstimatesVoting[0].VotingObjects[1].Content", "Вариант ответа", "form-control voteObj");
+    div = createDiv("form-group");
     div.appendChild(field);
     divBlock.appendChild(div);
 
     container.appendChild(divBlock);
 }
 
+function createTextInput(name, placeholder, fieldClass) {
+    field = document.createElement("input");
+    field.setAttribute("class", fieldClass);
+    field.setAttribute("id", name);
+    field.setAttribute("name", name);
+    field.setAttribute("type", "text");
+    field.setAttribute("placeholder", placeholder);
+    field.setAttribute("asp-for", name);
+    return field;
+}
+
+function createDiv(divClass){
+    let div = document.createElement("div");
+    div.setAttribute("class", divClass);
+    return div;
+}
+
 function newVoteVariant(voteId) {
-    let container = document.getElementById("formatContent");
     let block = document.getElementById("block" + voteId);
     let voteObjCount = block.getElementsByClassName("voteObj").length;
     if (voteObjCount == 9) {
         block.getElementsByTagName("button")[0].disabled = true;
     }
-    let div = document.createElement("div");
-    div.setAttribute("class", "form-group");
-    field = document.createElement("input");
-    field.setAttribute("class", "form-control voteObj");
-    field.setAttribute("id", "Estimates[" + voteId + "].VotingObjects[" + voteObjCount + "]");
-    field.setAttribute("name", "EstimatesVoting[" + voteId + "].VotingObjects[" + voteObjCount + "].Content");
-    field.setAttribute("type", "text");
-    field.setAttribute("placeholder", "Вариант ответа");
-    field.setAttribute("asp-for", "EstimatesVoting[" + voteId + "].VotingObjects[" + voteObjCount + "].Content");
+    let div = createDiv("form-group")
+    let field = createTextInput("EstimatesVoting[" + voteId + "].VotingObjects[" + voteObjCount + "].Content", "Вариант ответа", "form-control voteObj")
     div.appendChild(field);
     block.appendChild(div);
 }
@@ -195,34 +181,23 @@ function newVoting() {
         document.getElementById("newVotingBtn").setAttribute('disabled', true);
     }
     let divBlock = document.createElement("div");
-    divBlock.setAttribute("id", "block"+voteCount);
+    divBlock.setAttribute("id", "block" + voteCount);
 
-    let divRow = document.createElement("div");
-    divRow.setAttribute("class", "row");
-
-    let divCol = document.createElement("div");
-    divCol.setAttribute("class", "col-auto");
-    let field = document.createElement("input");
-    field.setAttribute("class", "form-control vote");
-    field.setAttribute("id", "EstimatesVoting[" + voteCount + "]");
-    field.setAttribute("name", "EstimatesVoting[" + voteCount + "].Characteristic");
-    field.setAttribute("type", "text");
-    field.setAttribute("placeholder", "Характеристика");
-    field.setAttribute("asp-for", "EstimatesVoting[" + voteCount + "].Characteristic");
+    let divRow = createDiv("row");
+    let divCol = createDiv("col-auto");
+    let field = createTextInput("EstimatesVoting[" + voteCount + "].Characteristic", "Характеристика", "form-control vote")
     divCol.appendChild(field);
     divRow.appendChild(divCol);
     divBlock.appendChild(divRow);
 
-    divCol = document.createElement("div");
-    divCol.setAttribute("class", "col-auto");
+    divCol = createDiv("col-auto");
     field = document.createElement("p");
     field.innerHTML = "<p>Добавить вариант ответа</p>";
     divCol.appendChild(field);
     divRow.appendChild(divCol);
     divBlock.appendChild(divRow);
 
-    divCol = document.createElement("div");
-    divCol.setAttribute("class", "col-auto addBtn");
+    divCol = createDiv("col-auto addBtn");
     field = document.createElement("button");
     field.setAttribute("type", "button");
     field.innerHTML = "+";
@@ -231,28 +206,13 @@ function newVoting() {
     divRow.appendChild(divCol);
     divBlock.appendChild(divRow);
    
-
-    let div = document.createElement("div");
-    div.setAttribute("class", "form-group");
-    field = document.createElement("input");
-    field.setAttribute("class", "form-control voteObj");
-    field.setAttribute("id", "EstimatesVoting[" + voteCount + "].VotingObjects[0]");
-    field.setAttribute("name", "EstimatesVoting[" + voteCount + "].VotingObjects[0].Content");
-    field.setAttribute("type", "text");
-    field.setAttribute("placeholder", "Вариант ответа");
-    field.setAttribute("asp-for", "EstimatesVoting[" + voteCount + "].VotingObjects[0].Content");
+    let div = createDiv("form-group");
+    field = createTextInput("EstimatesVoting[" + voteCount + "].VotingObjects[0].Content", "Вариант ответа", "form-control voteObj");
     div.appendChild(field);
     divBlock.appendChild(div);
 
-    div = document.createElement("div");
-    div.setAttribute("class", "form-group");
-    field = document.createElement("input");
-    field.setAttribute("class", "form-control voteObj");
-    field.setAttribute("id", "EstimatesVoting[" + voteCount + "].VotingObjects[1]");
-    field.setAttribute("name", "EstimatesVoting[" + voteCount + "].VotingObjects[1].Content");
-    field.setAttribute("type", "text");
-    field.setAttribute("placeholder", "Вариант ответа");
-    field.setAttribute("asp-for", "EstimatesVoting[" + voteCount + "].VotingObjects[1].Content");
+    div = createDiv("form-group");
+    field = createTextInput("EstimatesVoting[" + voteCount + "].VotingObjects[1].Content", "Вариант ответа", "form-control voteObj");
     div.appendChild(field);
     divBlock.appendChild(div);
 
@@ -260,7 +220,119 @@ function newVoting() {
 }
 
 function newRangingFields() {
-    alert("ranging")
+    let container = document.getElementById("formatContent");
+    container.innerHTML = '<div class="col-auto"> <p>Добавить ранжирование</p> </div>'
+    container.innerHTML += '<div class="col-auto"> <button type="button" id="newRangingBtn" onclick="newRanging()">+</button> </div>'
 
+    let divBlock = document.createElement("div");
+    divBlock.setAttribute("id", "block0");
+
+    let divRow = createDiv("row")
+    let divCol = createDiv("col-auto")
+    let field = createTextInput("EstimatesRanging[0].Characteristic", "Характеристика для ранжирования", "form-control vote")
+    divCol.appendChild(field);
+    divRow.appendChild(divCol);
+    divBlock.appendChild(divRow);
+
+    divCol = createDiv("col-auto")
+    field = document.createElement("p");
+    field.innerHTML = "<p>Добавить объект ранжирования</p>";
+    divCol.appendChild(field);
+    divRow.appendChild(divCol);
+    divBlock.appendChild(divRow);
+
+    divCol = createDiv("col-auto addBtn")
+    field = document.createElement("button");
+    field.setAttribute("type", "button");
+    field.innerHTML = "+";
+    field.setAttribute("onclick", "newRangeObj(0)");
+    divCol.appendChild(field);
+    divRow.appendChild(divCol);
+    divBlock.appendChild(divRow);
+
+    field = createTextInput("EstimatesRanging[0].RangingObjects[0].Content", "Объект ранжирования", "form-control voteObj");
+    div = createDiv("form-group");
+    div.appendChild(field);
+    divBlock.appendChild(div);
+
+    field = createTextInput("EstimatesRanging[0].RangingObjects[1].Content", "Объект ранжирования", "form-control voteObj");
+    div = createDiv("form-group");
+    div.appendChild(field);
+    divBlock.appendChild(div);
+
+    field = createTextInput("EstimatesRanging[0].RangingObjects[2].Content", "Объект ранжирования", "form-control voteObj");
+    div = createDiv("form-group");
+    div.appendChild(field);
+    divBlock.appendChild(div);
+
+    container.appendChild(divBlock);
+}
+function newRangeObj(rangeId) {
+    let block = document.getElementById("block" + rangeId);
+    let rangeObjCount = block.getElementsByClassName("voteObj").length;
+    if (rangeObjCount == 9) {
+        block.getElementsByTagName("button")[0].disabled = true;
+    }
+    let div = createDiv("form-group")
+    let field = createTextInput("EstimatesRanging[" + rangeId + "].RangingObjects[" + rangeObjCount + "].Content", "Объект ранжирования", "form-control voteObj")
+    div.appendChild(field);
+    block.appendChild(div);
+}
+
+function newRanging() {
+    let container = document.getElementById("formatContent");
+    let rangeCount = container.getElementsByClassName("vote").length;
+    if (rangeCount == 9) {
+        document.getElementById("newRangingBtn").setAttribute('disabled', true);
+    }
+    let divBlock = document.createElement("div");
+    divBlock.setAttribute("id", "block" + rangeCount);
+
+    let divRow = createDiv("row");
+    let divCol = createDiv("col-auto");
+    let field = createTextInput("EstimatesRanging[" + rangeCount + "].Characteristic", "Характеристика для ранжирования", "form-control vote")
+    divCol.appendChild(field);
+    divRow.appendChild(divCol);
+    divBlock.appendChild(divRow);
+
+    divCol = createDiv("col-auto");
+    field = document.createElement("p");
+    field.innerHTML = "<p>Добавить объект ранжирования</p>";
+    divCol.appendChild(field);
+    divRow.appendChild(divCol);
+    divBlock.appendChild(divRow);
+
+    divCol = createDiv("col-auto addBtn");
+    field = document.createElement("button");
+    field.setAttribute("type", "button");
+    field.innerHTML = "+";
+    field.setAttribute("onclick", "newRangeObj(" + rangeCount + ")");
+    divCol.appendChild(field);
+    divRow.appendChild(divCol);
+    divBlock.appendChild(divRow);
+
+    let div = createDiv("form-group");
+    field = createTextInput("EstimatesRanging[" + rangeCount + "].RangingObjects[0].Content", "Объект ранжирования", "form-control voteObj");
+    div.appendChild(field);
+    divBlock.appendChild(div);
+
+    div = createDiv("form-group");
+    field = createTextInput("EstimatesRanging[" + rangeCount + "].RangingObjects[1].Content", "Объект ранжирования", "form-control voteObj");
+    div.appendChild(field);
+    divBlock.appendChild(div);
+
+    div = createDiv("form-group");
+    field = createTextInput("EstimatesRanging[" + rangeCount + "].RangingObjects[2].Content", "Объект ранжирования", "form-control voteObj");
+    div.appendChild(field);
+    divBlock.appendChild(div);
+
+    container.appendChild(divBlock);
+}
+
+function selectRadio(radioNumber) {
+    result = document.getElementById("scaleResult");
+    //result.setAttribute("name", "EstimatesScale["+0+"].Count");
+    //result.setAttribute("asp-for", "");
+    result.setAttribute("value", radioNumber);
 }
 

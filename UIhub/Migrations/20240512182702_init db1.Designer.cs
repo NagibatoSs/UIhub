@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using UIhub.Data;
 
@@ -11,9 +12,11 @@ using UIhub.Data;
 namespace UIhub.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240512182702_init db1")]
+    partial class initdb1
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -334,28 +337,6 @@ namespace UIhub.Migrations
                     b.ToTable("RangingObjects");
                 });
 
-            modelBuilder.Entity("UIhub.Models.RangingSequence", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int?>("EstimateRangingId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("NumbersOrder")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("EstimateRangingId");
-
-                    b.ToTable("RangingSequences");
-                });
-
             modelBuilder.Entity("UIhub.Models.User", b =>
                 {
                     b.Property<string>("Id")
@@ -480,6 +461,10 @@ namespace UIhub.Migrations
             modelBuilder.Entity("UIhub.Models.EstimateRanging", b =>
                 {
                     b.HasBaseType("UIhub.Models.Estimate");
+
+                    b.Property<string>("NumbersOrder")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasDiscriminator().HasValue("EstimateRanging");
                 });
@@ -617,13 +602,6 @@ namespace UIhub.Migrations
                         .HasForeignKey("EstimateRangingId");
                 });
 
-            modelBuilder.Entity("UIhub.Models.RangingSequence", b =>
-                {
-                    b.HasOne("UIhub.Models.EstimateRanging", null)
-                        .WithMany("Sequences")
-                        .HasForeignKey("EstimateRangingId");
-                });
-
             modelBuilder.Entity("UIhub.Models.User", b =>
                 {
                     b.HasOne("UIhub.Models.UserRank", "Rank")
@@ -661,8 +639,6 @@ namespace UIhub.Migrations
             modelBuilder.Entity("UIhub.Models.EstimateRanging", b =>
                 {
                     b.Navigation("RangingObjects");
-
-                    b.Navigation("Sequences");
                 });
 
             modelBuilder.Entity("UIhub.Models.EstimateVoting", b =>

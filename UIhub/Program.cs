@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using UIhub.Data;
 using UIhub.Models;
-using UIXtimate.Service;
+using UIhub.Service;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,6 +17,9 @@ builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 builder.Services.AddDefaultIdentity<User>(options => options.SignIn.RequireConfirmedAccount = false).AddEntityFrameworkStores<ApplicationDbContext>();
 
 builder.Services.AddScoped<IPost, PostService>();
+builder.Services.AddScoped<IPostReply, PostReplyService>();
+builder.Services.AddScoped<IUser, UserService>();
+builder.Services.AddScoped<IUserRank, UserRankService>();
 
 builder.Services.AddControllersWithViews();
 
@@ -44,6 +47,11 @@ app.UseAuthorization();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Post}/{action=MainPage}/{id?}");
+//app.UseEndpoints(endpoints =>
+//{
+//    endpoints.MapControllerRoute("default", "{controller=Post}/{action=MainPage}/{id?}");
+//    endpoints.MapControllerRoute("admin", "{controller=Home}/{action=Index}/{id?}");
+//});
 app.MapRazorPages();
 
 app.Run();

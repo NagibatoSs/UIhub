@@ -4,6 +4,8 @@ using UIhub.Models;
 using UIhub.Models.ViewModels;
 using Microsoft.AspNetCore.Identity;
 using System.Reflection.PortableExecutable;
+using System.Security.Claims;
+using UIhub.Service;
 
 namespace UIhub.Controllers
 {
@@ -44,16 +46,18 @@ namespace UIhub.Controllers
             if (id == 0) //ошибка если ссылка некорректна
                 return View();
             var postModel = CreatePostViewModel(id);
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            //var user = _userManager.FindByIdAsync(userId).Result;
             var model = new PostContentViewModel
             {
                 Id = id,
-                PostViewModel = postModel
+                PostViewModel = postModel,
+                CurrentUserId = userId
             };
             return View(model);
         }
         public IActionResult CreateNewPost(NewPostViewModel model = null)
         {
-            // if (User.Identity.IsAuthenticated)
             if (model == null)
             {
                 model = CreateNewPostViewModel();
@@ -66,8 +70,8 @@ namespace UIhub.Controllers
         [HttpPost]
         public async Task<IActionResult> PlacePost(NewPostViewModel model)
         {
-            //var userId = _userManager.GetUserId(User);
-            var userId = "8ff7a4c5-33b3-4332-a4d4-979ba86ec589";
+            var userId = _userManager.GetUserId(User);
+            //var userId = "8ff7a4c5-33b3-4332-a4d4-979ba86ec589";
             var user = _userManager.FindByIdAsync(userId).Result;
             var post = BuildPost(model, user);
             _postService.Create(post).Wait();
@@ -91,8 +95,6 @@ namespace UIhub.Controllers
                 AutoAssessment = model.AutoAssessment,
                 Estimates = new List<Estimate>()
             };
-
-            //Estimates = new List<Estimate>(),
             if (model.InterfaceLayoutsSrc != null)
             {
                 foreach (var content in model.InterfaceLayoutsSrc)
@@ -123,9 +125,28 @@ namespace UIhub.Controllers
                     voting.VotingObjects = new List<VotingObject>();
                     foreach (var obj in estimate.VotingObjects)
                     {
+                        obj.VoteCount = 0;
                         voting.VotingObjects.Add(obj);
                     }
                     post.Estimates.Add(voting);
+                }
+            }
+            if (model.EstimateFormat == "ranging")
+            {
+                foreach (var estimate in model.EstimatesRanging)
+                {
+                    if (estimate.RangingObjects == null) continue;
+                    var ranging = new EstimateRanging
+                    {
+                        Characteristic = estimate.Characteristic,
+                    };
+                    ranging.RangingObjects = new List<RangingObject>();
+                    foreach (var obj in estimate.RangingObjects)
+                    {
+                        obj.NumberInSequence = "0";
+                        ranging.RangingObjects.Add(obj);
+                    }
+                    post.Estimates.Add(ranging);
                 }
             }
             return post;
@@ -140,7 +161,7 @@ namespace UIhub.Controllers
         private PostViewModel CreatePostViewModel(int id)
         {
             var post = _postService.GetPostById(id);
-            return new PostViewModel
+            var model = new PostViewModel
             {
                 Id = post.Id,
                 Title = post.Title,
@@ -152,8 +173,54 @@ namespace UIhub.Controllers
                 AutoAssessment = post.AutoAssessment,
                 Replies = post.Replies,
                 Estimates = post.Estimates,
+                EstimatesScale = new List<EstimateScale>(),
+                EstimatesVoting = new List<EstimateVoting>(),
+                EstimatesRanging = new List<EstimateRanging>(),
                 InterfaceLayouts = post.InterfaceLayouts
             };
+            switch (post.Estimates[0].Discriminator)
+            {
+                case "EstimateScale":
+                    foreach (var item in post.Estimates)
+                        model.EstimatesScale.Add(item as EstimateScale);
+                    break;
+                case "EstimateVoting":
+                    foreach (var item in post.Estimates)
+                        model.EstimatesVoting.Add(item as EstimateVoting);
+                    break;
+                case "EstimateRanging":
+                    foreach (var item in post.Estimates)
+                        model.EstimatesRanging.Add(item as EstimateRanging);
+                    break;
+            }
+            return model;
         }
+
+
+        //[HttpPost]
+        //public async Task<IActionResult> SetScaleEstimate(PostContentViewModel model)
+        //{
+        //    var modelScale = model.NewScaleEstimateViewModel;
+        //    var userId = _userManager.GetUserId(User);
+        //    var post = _postService.GetPostById(model.Id);
+        //    var user = _userManager.FindByIdAsync(userId).Result;
+        //    modelScale.Post = post;
+        //    var reply = BuildReply(modelReply, user);
+        //    _replyService.Create(reply).Wait();
+        //    //сюда юзер рейтинг манипуляции
+        //    return RedirectToAction("OpenPostById", "Post", new { id = post.Id });
+        //}
+        //private PostReply BuildScale(NewReplyViewModel model, User user)
+        //{
+        //    var reply = new PostReply
+        //    {
+        //        Content = model.Content,
+        //        Author = user,
+        //        Post = model.Post,
+        //        Created = DateTime.Now,
+        //        LikesCount = 0
+        //    };
+        //    return reply;
+        //}
     }
 }

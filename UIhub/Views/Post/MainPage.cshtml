@@ -1,7 +1,10 @@
 ﻿@model UIhub.Models.ViewModels.MainPageViewModel
-<a asp-controller="Post" asp-action="CreateNewPost">
-    Создать публикацию
-</a>
+@if (User.Identity.IsAuthenticated)
+{
+    <a asp-controller="Post" asp-action="CreateNewPost">
+        Создать публикацию
+    </a>
+}
 <h1>Топ публикаций</h1>
 <table class="table table-hover" id="postIndexTable">
     <tbody>
