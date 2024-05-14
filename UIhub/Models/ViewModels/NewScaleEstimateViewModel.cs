@@ -2,6 +2,8 @@
 {
     public class NewScaleEstimateViewModel
     {
-        public List<string> SelectedValues { get; set; }
+        public string Characteristic {  get; set; }
+        public string SelectedValue { get; set; }
+        
     }
 }

@@ -20,6 +20,7 @@ builder.Services.AddScoped<IPost, PostService>();
 builder.Services.AddScoped<IPostReply, PostReplyService>();
 builder.Services.AddScoped<IUser, UserService>();
 builder.Services.AddScoped<IUserRank, UserRankService>();
+builder.Services.AddScoped<IEstimate, EstimateService>();
 
 builder.Services.AddControllersWithViews();
 

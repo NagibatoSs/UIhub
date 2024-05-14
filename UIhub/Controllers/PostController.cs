@@ -13,11 +13,13 @@ namespace UIhub.Controllers
     {
         private readonly IPost _postService;
         private readonly UserManager<User> _userManager;
+        private readonly IEstimate _estimateService;
 
-        public PostController(IPost postService, UserManager<User> userManager)
+        public PostController(IPost postService, UserManager<User> userManager, IEstimate estimateService)
         {
             _postService = postService;
             _userManager = userManager;
+            _estimateService = estimateService;
         }
         public IActionResult MainPage()
         {
@@ -197,19 +199,29 @@ namespace UIhub.Controllers
         }
 
 
-        //[HttpPost]
-        //public async Task<IActionResult> SetScaleEstimate(PostContentViewModel model)
-        //{
-        //    var modelScale = model.NewScaleEstimateViewModel;
-        //    var userId = _userManager.GetUserId(User);
-        //    var post = _postService.GetPostById(model.Id);
-        //    var user = _userManager.FindByIdAsync(userId).Result;
-        //    modelScale.Post = post;
-        //    var reply = BuildReply(modelReply, user);
-        //    _replyService.Create(reply).Wait();
-        //    //сюда юзер рейтинг манипуляции
-        //    return RedirectToAction("OpenPostById", "Post", new { id = post.Id });
-        //}
+        [HttpPost]
+        public async Task<IActionResult> SetScaleEstimate(PostContentViewModel model)
+        {
+            for (int i=0;i<model.NewScaleEstimateViewModel.Count;i++)
+            {
+                var modelScale = model.NewScaleEstimateViewModel[i];
+                var estimateScale = _estimateService.GetEstimateScale(model.PostViewModel.EstimatesScale[i].Id);
+                if (modelScale.SelectedValue == "select 1")
+                    estimateScale.Count_1++;
+                if (modelScale.SelectedValue == "select 2")
+                    estimateScale.Count_2++;
+                if (modelScale.SelectedValue == "select 3")
+                    estimateScale.Count_3++;
+                if (modelScale.SelectedValue == "select 4")
+                    estimateScale.Count_4++;
+                if (modelScale.SelectedValue == "select 5")
+                    estimateScale.Count_5++;
+                _estimateService.UpdateEstimateScale(estimateScale).Wait();
+            }
+            //_replyService.Create(reply).Wait();
+            //сюда юзер рейтинг манипуляции
+            return RedirectToAction("OpenPostById", "Post", new { id = model.Id });
+        }
         //private PostReply BuildScale(NewReplyViewModel model, User user)
         //{
         //    var reply = new PostReply
