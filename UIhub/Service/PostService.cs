@@ -32,7 +32,12 @@ namespace UIhub.Service
                     .ThenInclude(a => a.Rank)
                 .Include(post => post.InterfaceLayouts)
                 .Include(post => post.AutoAssessment)
-                .Include(post => post.Estimates);
+                .Include(post => post.Estimates)
+                    .ThenInclude(est => (est as EstimateVoting).VotingObjects)
+                .Include(post => post.Estimates)
+                    .ThenInclude(est => (est as EstimateRanging).RangingObjects)
+                .Include(post => post.Estimates)
+                    .ThenInclude(est => (est as EstimateRanging).Sequences);
             return posts.FirstOrDefault();
         }
         public async Task Create(Post post)

@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Identity;
 using System.Reflection.PortableExecutable;
 using System.Security.Claims;
 using UIhub.Service;
+using System.Text;
 
 namespace UIhub.Controllers
 {
@@ -205,7 +206,8 @@ namespace UIhub.Controllers
             for (int i=0;i<model.NewScaleEstimateViewModel.Count;i++)
             {
                 var modelScale = model.NewScaleEstimateViewModel[i];
-                var estimateScale = _estimateService.GetEstimateScale(model.PostViewModel.EstimatesScale[i].Id);
+                var estimateScale =( _estimateService.GetEstimate(model.PostViewModel.EstimatesScale[i].Id)) as EstimateScale;
+
                 if (modelScale.SelectedValue == "select 1")
                     estimateScale.Count_1++;
                 if (modelScale.SelectedValue == "select 2")
@@ -216,23 +218,47 @@ namespace UIhub.Controllers
                     estimateScale.Count_4++;
                 if (modelScale.SelectedValue == "select 5")
                     estimateScale.Count_5++;
-                _estimateService.UpdateEstimateScale(estimateScale).Wait();
+                _estimateService.UpdateEstimate(estimateScale).Wait();
             }
             //_replyService.Create(reply).Wait();
-            //сюда юзер рейтинг манипуляции
             return RedirectToAction("OpenPostById", "Post", new { id = model.Id });
         }
-        //private PostReply BuildScale(NewReplyViewModel model, User user)
-        //{
-        //    var reply = new PostReply
-        //    {
-        //        Content = model.Content,
-        //        Author = user,
-        //        Post = model.Post,
-        //        Created = DateTime.Now,
-        //        LikesCount = 0
-        //    };
-        //    return reply;
-        //}
+
+        [HttpPost]
+        public async Task<IActionResult> SetVotingEstimate(PostContentViewModel model)
+        {
+            for (int i = 0; i < model.NewVotingEstimateViewModel.Count; i++)
+            {
+                var modelVoting = model.NewVotingEstimateViewModel[i];
+                var estimateVote = _estimateService.GetEstimateVoting(model.PostViewModel.EstimatesVoting[i].Id);
+                estimateVote.VotingObjects[int.Parse(modelVoting.SelectedValue)].VoteCount++;
+                _estimateService.UpdateEstimate(estimateVote).Wait();
+            }
+            return RedirectToAction("OpenPostById", "Post", new { id = model.Id });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SetRangingEstimate(PostContentViewModel model)
+        {
+            for (int i = 0; i < model.NewRangingEstimateViewModel.Count; i++)
+            {
+                var modelRanging = model.NewRangingEstimateViewModel[i];
+                var estimateRange = _estimateService.GetEstimateRanging(model.PostViewModel.EstimatesRanging[i].Id);
+                StringBuilder order = new StringBuilder();
+                for (int j=0;j<estimateRange.RangingObjects.Count;j++)
+                {
+                    var b = model.PostViewModel.EstimatesRanging[i].RangingObjects[j].NumberInSequence;
+                    var numberByIndex = int.Parse(b) - 1;
+                    estimateRange.RangingObjects[j].NumberInSequence = numberByIndex.ToString();
+                    order.Append(estimateRange.RangingObjects[j].NumberInSequence);
+                }
+                var sequence = new RangingSequence() { NumbersOrder = order.ToString() };
+                estimateRange.Sequences.Add(sequence);
+                _estimateService.UpdateEstimate(estimateRange).Wait();
+            }
+            //_replyService.Create(reply).Wait();
+            return RedirectToAction("OpenPostById", "Post", new { id = model.Id });
+        }
+
     }
 }

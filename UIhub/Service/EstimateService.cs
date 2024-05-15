@@ -12,22 +12,43 @@ namespace UIhub.Service
             _context = context;
         }
 
-        public async Task UpdateEstimateScale(EstimateScale estimateScale)
+        public async Task UpdateEstimate(Estimate estimate)
         {
-            _context.Update(estimateScale);
+            _context.Update(estimate);
             await _context.SaveChangesAsync();
         }
+
         public IEnumerable<EstimateScale> GetAllEstimateScale()
         {
             return _context.EstimateScales;
         }
-        public EstimateScale GetEstimateScale(int id)
+        public EstimateScale? GetEstimateScale(int id)
         {
             return _context.EstimateScales
                 .Where(e => e.Id == id)
                 .FirstOrDefault();
         }
-
+        public Estimate GetEstimate(int id)
+        {
+            return _context.Estimates
+                .Where(e => e.Id == id)
+                .FirstOrDefault();
+        }
+        public EstimateVoting? GetEstimateVoting(int id)
+        {
+            return _context.EstimateVotings
+                .Where(e => e.Id == id)
+                .Include (e => e.VotingObjects)
+                .FirstOrDefault();
+        }
+        public EstimateRanging? GetEstimateRanging(int id)
+        {
+            return _context.EstimateRangings
+                .Where(e => e.Id == id)
+                .Include(e=> e.RangingObjects)
+                .Include(e => e.Sequences)
+                .FirstOrDefault();
+        }
         //public async Task Create(EstimateScale postReply)
         //{
         //    _context.Add(postReply);
