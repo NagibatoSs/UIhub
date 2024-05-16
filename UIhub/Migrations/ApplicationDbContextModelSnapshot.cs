@@ -210,6 +210,35 @@ namespace UIhub.Migrations
                     b.UseTphMappingStrategy();
                 });
 
+            modelBuilder.Entity("UIhub.Models.EstimateObject", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Content")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("EstimateScaleId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("EstimateVotingId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("VoteCount")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EstimateScaleId");
+
+                    b.HasIndex("EstimateVotingId");
+
+                    b.ToTable("EstimateObjects");
+                });
+
             modelBuilder.Entity("UIhub.Models.InterfaceLayout", b =>
                 {
                     b.Property<int>("Id")
@@ -452,31 +481,6 @@ namespace UIhub.Migrations
                     b.ToTable("UserRanks");
                 });
 
-            modelBuilder.Entity("UIhub.Models.VotingObject", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Content")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("EstimateVotingId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("VoteCount")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("EstimateVotingId");
-
-                    b.ToTable("VotingObjects");
-                });
-
             modelBuilder.Entity("UIhub.Models.EstimateRanging", b =>
                 {
                     b.HasBaseType("UIhub.Models.Estimate");
@@ -487,21 +491,6 @@ namespace UIhub.Migrations
             modelBuilder.Entity("UIhub.Models.EstimateScale", b =>
                 {
                     b.HasBaseType("UIhub.Models.Estimate");
-
-                    b.Property<int>("Count_1")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Count_2")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Count_3")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Count_4")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Count_5")
-                        .HasColumnType("int");
 
                     b.HasDiscriminator().HasValue("EstimateScale");
                 });
@@ -571,6 +560,17 @@ namespace UIhub.Migrations
                         .HasForeignKey("PostId");
                 });
 
+            modelBuilder.Entity("UIhub.Models.EstimateObject", b =>
+                {
+                    b.HasOne("UIhub.Models.EstimateScale", null)
+                        .WithMany("EstimateObjects")
+                        .HasForeignKey("EstimateScaleId");
+
+                    b.HasOne("UIhub.Models.EstimateVoting", null)
+                        .WithMany("EstimateObjects")
+                        .HasForeignKey("EstimateVotingId");
+                });
+
             modelBuilder.Entity("UIhub.Models.InterfaceLayout", b =>
                 {
                     b.HasOne("UIhub.Models.Post", null)
@@ -635,13 +635,6 @@ namespace UIhub.Migrations
                     b.Navigation("Rank");
                 });
 
-            modelBuilder.Entity("UIhub.Models.VotingObject", b =>
-                {
-                    b.HasOne("UIhub.Models.EstimateVoting", null)
-                        .WithMany("VotingObjects")
-                        .HasForeignKey("EstimateVotingId");
-                });
-
             modelBuilder.Entity("UIhub.Models.Post", b =>
                 {
                     b.Navigation("Estimates");
@@ -665,9 +658,14 @@ namespace UIhub.Migrations
                     b.Navigation("Sequences");
                 });
 
+            modelBuilder.Entity("UIhub.Models.EstimateScale", b =>
+                {
+                    b.Navigation("EstimateObjects");
+                });
+
             modelBuilder.Entity("UIhub.Models.EstimateVoting", b =>
                 {
-                    b.Navigation("VotingObjects");
+                    b.Navigation("EstimateObjects");
                 });
 #pragma warning restore 612, 618
         }

@@ -14,13 +14,12 @@ namespace UIhub.Controllers
     {
         private readonly IPost _postService;
         private readonly UserManager<User> _userManager;
-        private readonly IEstimate _estimateService;
+        private int scaleObjectsCount = 5;
 
         public PostController(IPost postService, UserManager<User> userManager, IEstimate estimateService)
         {
             _postService = postService;
             _userManager = userManager;
-            _estimateService = estimateService;
         }
         public IActionResult MainPage()
         {
@@ -111,8 +110,7 @@ namespace UIhub.Controllers
                 foreach (var estimate in model.EstimatesScale)
                 {
                     if (estimate.Characteristic == null) continue;
-                    var scale = new EstimateScale { Characteristic = estimate.Characteristic,
-                        Count_1 =0, Count_2 =0, Count_3 = 0, Count_4=0, Count_5=0};
+                    var scale = new EstimateScale { Characteristic = estimate.Characteristic, Count_1=0, Count_2=0, Count_3 =0, Count_4=0, Count_5=0 };
                     post.Estimates.Add(scale);
                 }
             }
@@ -181,84 +179,29 @@ namespace UIhub.Controllers
                 EstimatesRanging = new List<EstimateRanging>(),
                 InterfaceLayouts = post.InterfaceLayouts
             };
-            switch (post.Estimates[0].Discriminator)
+            if (post.Estimates[0].Discriminator != null)
             {
-                case "EstimateScale":
-                    foreach (var item in post.Estimates)
-                        model.EstimatesScale.Add(item as EstimateScale);
-                    break;
-                case "EstimateVoting":
-                    foreach (var item in post.Estimates)
-                        model.EstimatesVoting.Add(item as EstimateVoting);
-                    break;
-                case "EstimateRanging":
-                    foreach (var item in post.Estimates)
-                        model.EstimatesRanging.Add(item as EstimateRanging);
-                    break;
+                switch (post.Estimates[0].Discriminator)
+                {
+                    case "EstimateScale":
+                        foreach (var item in post.Estimates)
+                            model.EstimatesScale.Add(item as EstimateScale);
+                        break;
+                    case "EstimateVoting":
+                        foreach (var item in post.Estimates)
+                            model.EstimatesVoting.Add(item as EstimateVoting);
+                        break;
+                    case "EstimateRanging":
+                        foreach (var item in post.Estimates)
+                            model.EstimatesRanging.Add(item as EstimateRanging);
+                        break;
+                }
             }
             return model;
         }
 
 
-        [HttpPost]
-        public async Task<IActionResult> SetScaleEstimate(PostContentViewModel model)
-        {
-            for (int i=0;i<model.NewScaleEstimateViewModel.Count;i++)
-            {
-                var modelScale = model.NewScaleEstimateViewModel[i];
-                var estimateScale =( _estimateService.GetEstimate(model.PostViewModel.EstimatesScale[i].Id)) as EstimateScale;
-
-                if (modelScale.SelectedValue == "select 1")
-                    estimateScale.Count_1++;
-                if (modelScale.SelectedValue == "select 2")
-                    estimateScale.Count_2++;
-                if (modelScale.SelectedValue == "select 3")
-                    estimateScale.Count_3++;
-                if (modelScale.SelectedValue == "select 4")
-                    estimateScale.Count_4++;
-                if (modelScale.SelectedValue == "select 5")
-                    estimateScale.Count_5++;
-                _estimateService.UpdateEstimate(estimateScale).Wait();
-            }
-            //_replyService.Create(reply).Wait();
-            return RedirectToAction("OpenPostById", "Post", new { id = model.Id });
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> SetVotingEstimate(PostContentViewModel model)
-        {
-            for (int i = 0; i < model.NewVotingEstimateViewModel.Count; i++)
-            {
-                var modelVoting = model.NewVotingEstimateViewModel[i];
-                var estimateVote = _estimateService.GetEstimateVoting(model.PostViewModel.EstimatesVoting[i].Id);
-                estimateVote.VotingObjects[int.Parse(modelVoting.SelectedValue)].VoteCount++;
-                _estimateService.UpdateEstimate(estimateVote).Wait();
-            }
-            return RedirectToAction("OpenPostById", "Post", new { id = model.Id });
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> SetRangingEstimate(PostContentViewModel model)
-        {
-            for (int i = 0; i < model.NewRangingEstimateViewModel.Count; i++)
-            {
-                var modelRanging = model.NewRangingEstimateViewModel[i];
-                var estimateRange = _estimateService.GetEstimateRanging(model.PostViewModel.EstimatesRanging[i].Id);
-                StringBuilder order = new StringBuilder();
-                for (int j=0;j<estimateRange.RangingObjects.Count;j++)
-                {
-                    var b = model.PostViewModel.EstimatesRanging[i].RangingObjects[j].NumberInSequence;
-                    var numberByIndex = int.Parse(b) - 1;
-                    estimateRange.RangingObjects[j].NumberInSequence = numberByIndex.ToString();
-                    order.Append(estimateRange.RangingObjects[j].NumberInSequence);
-                }
-                var sequence = new RangingSequence() { NumbersOrder = order.ToString() };
-                estimateRange.Sequences.Add(sequence);
-                _estimateService.UpdateEstimate(estimateRange).Wait();
-            }
-            //_replyService.Create(reply).Wait();
-            return RedirectToAction("OpenPostById", "Post", new { id = model.Id });
-        }
+       
 
     }
 }

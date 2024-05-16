@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace UIhub.Migrations
 {
     /// <inheritdoc />
-    public partial class init : Migration
+    public partial class initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -23,34 +23,6 @@ namespace UIhub.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AspNetRoles", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "AspNetUsers",
-                columns: table => new
-                {
-                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    Discriminator = table.Column<string>(type: "nvarchar(13)", maxLength: 13, nullable: false),
-                    Reputation = table.Column<int>(type: "int", nullable: true),
-                    Points = table.Column<int>(type: "int", nullable: true),
-                    UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    NormalizedEmail = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    EmailConfirmed = table.Column<bool>(type: "bit", nullable: false),
-                    PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    SecurityStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ConcurrencyStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PhoneNumberConfirmed = table.Column<bool>(type: "bit", nullable: false),
-                    TwoFactorEnabled = table.Column<bool>(type: "bit", nullable: false),
-                    LockoutEnd = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
-                    LockoutEnabled = table.Column<bool>(type: "bit", nullable: false),
-                    AccessFailedCount = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_AspNetUsers", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -98,6 +70,40 @@ namespace UIhub.Migrations
                         name: "FK_AspNetRoleClaims_AspNetRoles_RoleId",
                         column: x => x.RoleId,
                         principalTable: "AspNetRoles",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "AspNetUsers",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Reputation = table.Column<int>(type: "int", nullable: false),
+                    Points = table.Column<int>(type: "int", nullable: false),
+                    RankId = table.Column<int>(type: "int", nullable: false),
+                    UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    NormalizedEmail = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    EmailConfirmed = table.Column<bool>(type: "bit", nullable: false),
+                    PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    SecurityStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ConcurrencyStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PhoneNumberConfirmed = table.Column<bool>(type: "bit", nullable: false),
+                    TwoFactorEnabled = table.Column<bool>(type: "bit", nullable: false),
+                    LockoutEnd = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    LockoutEnabled = table.Column<bool>(type: "bit", nullable: false),
+                    AccessFailedCount = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AspNetUsers", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_AspNetUsers_UserRanks_RankId",
+                        column: x => x.RankId,
+                        principalTable: "UserRanks",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -199,7 +205,7 @@ namespace UIhub.Migrations
                     Views = table.Column<int>(type: "int", nullable: false),
                     EstimateCount = table.Column<int>(type: "int", nullable: false),
                     IsTop = table.Column<bool>(type: "bit", nullable: false),
-                    AutoAssessmentId = table.Column<int>(type: "int", nullable: false),
+                    AutoAssessmentId = table.Column<int>(type: "int", nullable: true),
                     AuthorId = table.Column<string>(type: "nvarchar(450)", nullable: true)
                 },
                 constraints: table =>
@@ -214,8 +220,7 @@ namespace UIhub.Migrations
                         name: "FK_Posts_AutoAssesmentResults_AutoAssessmentId",
                         column: x => x.AutoAssessmentId,
                         principalTable: "AutoAssesmentResults",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -226,12 +231,7 @@ namespace UIhub.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Characteristic = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Discriminator = table.Column<string>(type: "nvarchar(21)", maxLength: 21, nullable: false),
-                    PostId = table.Column<int>(type: "int", nullable: true),
-                    Count_1 = table.Column<int>(type: "int", nullable: true),
-                    Count_2 = table.Column<int>(type: "int", nullable: true),
-                    Count_3 = table.Column<int>(type: "int", nullable: true),
-                    Count_4 = table.Column<int>(type: "int", nullable: true),
-                    Count_5 = table.Column<int>(type: "int", nullable: true)
+                    PostId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -291,6 +291,52 @@ namespace UIhub.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "EstimateObjects",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Content = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    VoteCount = table.Column<int>(type: "int", nullable: false),
+                    EstimateScaleId = table.Column<int>(type: "int", nullable: true),
+                    EstimateVotingId = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_EstimateObjects", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_EstimateObjects_Estimates_EstimateScaleId",
+                        column: x => x.EstimateScaleId,
+                        principalTable: "Estimates",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_EstimateObjects_Estimates_EstimateVotingId",
+                        column: x => x.EstimateVotingId,
+                        principalTable: "Estimates",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "RangingObjects",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Content = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    NumberInSequence = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    EstimateRangingId = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_RangingObjects", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_RangingObjects_Estimates_EstimateRangingId",
+                        column: x => x.EstimateRangingId,
+                        principalTable: "Estimates",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "RangingSequences",
                 columns: table => new
                 {
@@ -308,61 +354,6 @@ namespace UIhub.Migrations
                         principalTable: "Estimates",
                         principalColumn: "Id");
                 });
-
-            migrationBuilder.CreateTable(
-                name: "VotingObjects",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Content = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    VoteCount = table.Column<int>(type: "int", nullable: false),
-                    EstimateVotingId = table.Column<int>(type: "int", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_VotingObjects", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_VotingObjects_Estimates_EstimateVotingId",
-                        column: x => x.EstimateVotingId,
-                        principalTable: "Estimates",
-                        principalColumn: "Id");
-                });
-
-            migrationBuilder.CreateTable(
-                name: "RangingObjects",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Content = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    NumberInSequence = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    RangingSequenceId = table.Column<int>(type: "int", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_RangingObjects", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_RangingObjects_RangingSequences_RangingSequenceId",
-                        column: x => x.RangingSequenceId,
-                        principalTable: "RangingSequences",
-                        principalColumn: "Id");
-                });
-
-            migrationBuilder.InsertData(
-                table: "AspNetRoles",
-                columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
-                values: new object[] { "1ba64fb1-faf0-424f-8a66-af45363d4c58", null, "admin", "ADMIN" });
-
-            migrationBuilder.InsertData(
-                table: "AspNetUsers",
-                columns: new[] { "Id", "AccessFailedCount", "ConcurrencyStamp", "Discriminator", "Email", "EmailConfirmed", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "Points", "Reputation", "SecurityStamp", "TwoFactorEnabled", "UserName" },
-                values: new object[] { "8ff7a4c5-33b3-4332-a4d4-979ba86ec589", 0, "f727e45e-f676-438e-8a21-1bb4d2bc3fb0", "User", "zhuravleva_02@mail.ru", true, false, null, null, "NAGIBATOSS", "AQAAAAIAAYagAAAAEC6WQRQ3O9V5U0dyYKZLt7L+srHZZP8Gta49ALXsBGU1at6ky8Jvl5M+2UiFGQLlTA==", null, false, 0, 0, "", false, "NagibatoSs" });
-
-            migrationBuilder.InsertData(
-                table: "AspNetUserRoles",
-                columns: new[] { "RoleId", "UserId" },
-                values: new object[] { "1ba64fb1-faf0-424f-8a66-af45363d4c58", "8ff7a4c5-33b3-4332-a4d4-979ba86ec589" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
@@ -397,11 +388,26 @@ namespace UIhub.Migrations
                 column: "NormalizedEmail");
 
             migrationBuilder.CreateIndex(
+                name: "IX_AspNetUsers_RankId",
+                table: "AspNetUsers",
+                column: "RankId");
+
+            migrationBuilder.CreateIndex(
                 name: "UserNameIndex",
                 table: "AspNetUsers",
                 column: "NormalizedUserName",
                 unique: true,
                 filter: "[NormalizedUserName] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_EstimateObjects_EstimateScaleId",
+                table: "EstimateObjects",
+                column: "EstimateScaleId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_EstimateObjects_EstimateVotingId",
+                table: "EstimateObjects",
+                column: "EstimateVotingId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Estimates_PostId",
@@ -434,19 +440,14 @@ namespace UIhub.Migrations
                 column: "PostId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_RangingObjects_RangingSequenceId",
+                name: "IX_RangingObjects_EstimateRangingId",
                 table: "RangingObjects",
-                column: "RangingSequenceId");
+                column: "EstimateRangingId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_RangingSequences_EstimateRangingId",
                 table: "RangingSequences",
                 column: "EstimateRangingId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_VotingObjects_EstimateVotingId",
-                table: "VotingObjects",
-                column: "EstimateVotingId");
         }
 
         /// <inheritdoc />
@@ -468,6 +469,9 @@ namespace UIhub.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
+                name: "EstimateObjects");
+
+            migrationBuilder.DropTable(
                 name: "InterfaceLayouts");
 
             migrationBuilder.DropTable(
@@ -477,16 +481,10 @@ namespace UIhub.Migrations
                 name: "RangingObjects");
 
             migrationBuilder.DropTable(
-                name: "UserRanks");
-
-            migrationBuilder.DropTable(
-                name: "VotingObjects");
+                name: "RangingSequences");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
-
-            migrationBuilder.DropTable(
-                name: "RangingSequences");
 
             migrationBuilder.DropTable(
                 name: "Estimates");
@@ -499,6 +497,9 @@ namespace UIhub.Migrations
 
             migrationBuilder.DropTable(
                 name: "AutoAssesmentResults");
+
+            migrationBuilder.DropTable(
+                name: "UserRanks");
         }
     }
 }

@@ -18,6 +18,7 @@ namespace UIhub.Data
         public DbSet<Estimate> Estimates { get; set; }
         public DbSet<EstimateScale> EstimateScales { get; set; }
         public DbSet<EstimateVoting> EstimateVotings { get; set; }
+        //public DbSet<EstimateObject> EstimateObjects { get; set; }
         public DbSet<VotingObject> VotingObjects { get; set; }
         public DbSet<EstimateRanging> EstimateRangings { get; set; }
         public DbSet<RangingSequence> RangingSequences { get; set; }
