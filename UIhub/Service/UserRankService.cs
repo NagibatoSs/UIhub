@@ -18,6 +18,12 @@ namespace UIhub.Service
             //  .Include(reply => reply.Post)
             //  .Include(reply => reply.Author);
         }
+        public UserRank GetRank(int id)
+        {
+            return _context.UserRanks
+                .Where(r => r.Id == id)
+                .FirstOrDefault();
+        }
 
         public UserRank GetDefaultRank()
         {

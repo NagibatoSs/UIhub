@@ -10,15 +10,12 @@ namespace UIhub.Data
         public DbSet<Post> Posts { get; set; }
         public DbSet<PostReply> PostTextReplies { get; set; }
         public DbSet<User> Users { get; set; }
-        //public DbSet<UserRole> UserRoles { get; set; }
         public DbSet<UserRank> UserRanks { get; set; }
         public DbSet<AutoAssessmentResult> AutoAssesmentResults { get; set; }
-
         public DbSet<InterfaceLayout> InterfaceLayouts { get; set; }
         public DbSet<Estimate> Estimates { get; set; }
         public DbSet<EstimateScale> EstimateScales { get; set; }
         public DbSet<EstimateVoting> EstimateVotings { get; set; }
-        //public DbSet<EstimateObject> EstimateObjects { get; set; }
         public DbSet<VotingObject> VotingObjects { get; set; }
         public DbSet<EstimateRanging> EstimateRangings { get; set; }
         public DbSet<RangingSequence> RangingSequences { get; set; }

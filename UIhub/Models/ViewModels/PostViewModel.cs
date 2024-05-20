@@ -22,5 +22,7 @@ namespace UIhub.Models.ViewModels
         public List<EstimateVoting> EstimatesVoting { get; set; }
         public List<EstimateRanging> EstimatesRanging { get; set; }
         public IEnumerable<InterfaceLayout> InterfaceLayouts { get; set; }
+        public EstimatesResultViewModel EstimatesResult { get; set; }
+        public List<RangingEstimatePresenterViewModel> RangingEstimatesPresenter { get; set; }
     }
 }

@@ -21,6 +21,16 @@ namespace UIhub.Service
                 .Include(post => post.Replies)
                 .Include(post => post.Author);
         }
+        public async Task Create(Post post)
+        {
+            _context.Add(post);
+            await _context.SaveChangesAsync();
+        }
+        public async Task Update(Post post)
+        {
+            _context.Update(post);
+            await _context.SaveChangesAsync();
+        }
 
         public Post GetPostById(int id)
         {
@@ -39,11 +49,6 @@ namespace UIhub.Service
                 .Include(post => post.Estimates)
                     .ThenInclude(est => (est as EstimateRanging).Sequences);
             return posts.FirstOrDefault();
-        }
-        public async Task Create(Post post)
-        {
-            _context.Add(post);
-            await _context.SaveChangesAsync();
         }
     }
 }

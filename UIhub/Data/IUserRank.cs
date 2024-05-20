@@ -6,7 +6,7 @@ namespace UIhub.Data
     {
         IEnumerable<UserRank> GetAllRanks();
         UserRank GetDefaultRank();
-      //  UserRank GetUserRankByUserId(string userId);
-
+        //  UserRank GetUserRankByUserId(string userId);
+        UserRank GetRank(int id);
     }
 }

@@ -7,7 +7,6 @@ function newFigmaField() {
     let div = document.createElement("div");
     div.setAttribute("class", "form-group");
 
-    // создаем новое поле с новым id, name ДОЛЖЕН СОВПАДАТЬ С ИМЕНЕМ ПОЛЯ В МОДЕЛИ!!!
     let field = document.createElement("input");
     field.setAttribute("class", "form-control");
     field.setAttribute("id", "InterfaceLayoutsSrc[" + nextFieldId + "]");
@@ -27,7 +26,6 @@ function newImgField() {
     let div = document.createElement("div");
     div.setAttribute("class", "form-group");
 
-    // создаем новое поле с новым id, name ДОЛЖЕН СОВПАДАТЬ С ИМЕНЕМ ПОЛЯ В МОДЕЛИ!!!
     let field = document.createElement("input");
     field.setAttribute("class", "form-control");
     field.setAttribute("id", "InterfaceLayoutsSrc[" + nextFieldId + "]");
@@ -141,10 +139,8 @@ function newVotingFields() {
     div = createDiv("form-group");
     div.appendChild(field);
     divBlock.appendChild(div);
-
     container.appendChild(divBlock);
 }
-
 function createTextInput(name, placeholder, fieldClass) {
     field = document.createElement("input");
     field.setAttribute("class", fieldClass);
@@ -329,10 +325,69 @@ function newRanging() {
     container.appendChild(divBlock);
 }
 
-function selectRadio(radioNumber) {
-    result = document.getElementById("scaleResult");
-    //result.setAttribute("name", "EstimatesScale["+0+"].Count");
-    //result.setAttribute("asp-for", "");
-    result.setAttribute("value", radioNumber);
+function drawBar(id, dataValues) {
+    const ctx = document.getElementById("myChart "+ id);
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['1', '2', '3', '4', '5'],
+            datasets: [{
+                label: 'Количество голосов',
+                data: dataValues,
+                borderWidth: 1,
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(255, 159, 64, 0.2)',
+                    'rgba(255, 205, 86, 0.2)',
+                    'rgba(75, 192, 192, 0.2)',
+                    'rgba(54, 162, 235, 0.2)']
+            }],
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true,
+                }
+            }
+        }
+    });
 }
+//backgroundColor: [
+//    'rgba(255, 99, 132, 0.2)',
+//    'rgba(255, 159, 64, 0.2)',
+//    'rgba(255, 205, 86, 0.2)',
+//    'rgba(75, 192, 192, 0.2)',
+//    'rgba(54, 162, 235, 0.2)',
+//    'rgba(153, 102, 255, 0.2)',
+//    'rgba(201, 203, 207, 0.2)',
+//    'rgba(255, 99, 200, 0.2)',
+//    'rgba(150, 99, 132, 0.2)',
+//    'rgba(230, 255, 132, 0.2)'
+//];
+
+function drawDoughnut(id, dataValues, labels) {
+    const ctx = document.getElementById("myVoting " + id);
+    new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Количество голосов',
+                data: dataValues,
+                borderWidth: 1
+            }],
+        }
+    });
+}
+function drawVoting(id, estimatesVoting) {
+    let dataValues = []
+    let labels = []
+    for (var j = 0; j < estimatesVoting[id].VotingObjects.length; j++) {
+        dataValues.push(estimatesVoting[id].VotingObjects[j].VoteCount);
+        labels.push(estimatesVoting[id].VotingObjects[j].Content);
+    }
+    console.log(id)
+    drawDoughnut(id, dataValues, labels)
+}
+
 

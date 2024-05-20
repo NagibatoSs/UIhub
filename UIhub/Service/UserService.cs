@@ -11,6 +11,11 @@ namespace UIhub.Service
         {
             _context = context;
         }
+        public async Task Update(User user)
+        {
+            _context.Update(user);
+            await _context.SaveChangesAsync();
+        }
         public IEnumerable<Post> GetAllUserPostsById(string id)
         {
             return _context.Posts.Where(p => p.Author.Id == id);

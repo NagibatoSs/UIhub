@@ -4,15 +4,28 @@ using UIhub.Models.ViewModels;
 using UIhub.Models;
 using UIhub.Service;
 using UIhub.Data;
+using Microsoft.AspNetCore.Identity;
+using System.Security.Claims;
+using UIhub.Rating;
 
 namespace UIhub.Controllers
 {
     public class EstimateController : Controller
     {
         private readonly IEstimate _estimateService;
-        public EstimateController(IEstimate estimateService)
+        private readonly IPost _postService;
+        private readonly UserManager<User> _userManager;
+        private readonly IUser _userService;
+        private readonly IUserRank _userRankService;
+        private readonly RatingAccrual _rating;
+        public EstimateController(IEstimate estimateService, UserManager<User> userManager, IPost postService, IUser userService, IUserRank userRankService)
         {
             _estimateService = estimateService;
+            _userManager = userManager;
+            _postService = postService;
+            _userService = userService;
+            _userRankService = userRankService;
+            _rating = new RatingAccrual(_userManager, _userService, _userRankService);
         }
         [HttpPost]
         public async Task<IActionResult> SetScaleEstimate(PostContentViewModel model)
@@ -21,19 +34,35 @@ namespace UIhub.Controllers
             {
                 var modelScale = model.NewScaleEstimateViewModel[i];
                 var estimateScale = (_estimateService.GetEstimate(model.PostViewModel.EstimatesScale[i].Id)) as EstimateScale;
-                if (modelScale.SelectedValue == "1")
-                    estimateScale.Count_1++;
-                if (modelScale.SelectedValue == "2")
-                    estimateScale.Count_2++;
-                if (modelScale.SelectedValue == "3")
-                    estimateScale.Count_3++;
-                if (modelScale.SelectedValue == "4")
-                    estimateScale.Count_4++;
-                if (modelScale.SelectedValue == "5")
-                    estimateScale.Count_5++;
+                switch (modelScale.SelectedValue)
+                {
+                    case "1":
+                        estimateScale.Count_1++;
+                        break;
+                    case "2":
+                        estimateScale.Count_2++;
+                        break;
+                    case "3":
+                        estimateScale.Count_3++;
+                        break;
+                    case "4":
+                        estimateScale.Count_4++;
+                        break;
+                    case "5":
+                        estimateScale.Count_5++;
+                        break;
+                }
                 _estimateService.UpdateEstimate(estimateScale).Wait();
             }
+            AddPostEstimateCount(model.Id);
+            _rating.AddReputationOfEstimate(_userManager.GetUserId(User));
             return RedirectToAction("OpenPostById", "Post", new { id = model.Id });
+        }
+        private void AddPostEstimateCount(int id)
+        {
+            var post = _postService.GetPostById(id);
+            post.EstimateCount++;
+            _postService.Update(post).Wait();
         }
 
         [HttpPost]
@@ -46,6 +75,8 @@ namespace UIhub.Controllers
                 estimateVote.VotingObjects[int.Parse(modelVoting.SelectedValue)].VoteCount++;
                 _estimateService.UpdateEstimate(estimateVote).Wait();
             }
+            AddPostEstimateCount(model.Id);
+            _rating.AddReputationOfEstimate(_userManager.GetUserId(User));
             return RedirectToAction("OpenPostById", "Post", new { id = model.Id });
         }
 
@@ -61,14 +92,15 @@ namespace UIhub.Controllers
                 {
                     var b = model.PostViewModel.EstimatesRanging[i].RangingObjects[j].NumberInSequence;
                     var numberByIndex = int.Parse(b) - 1;
-                    estimateRange.RangingObjects[j].NumberInSequence = numberByIndex.ToString();
+                    estimateRange.RangingObjects[j].NumberInSequence = j.ToString();
                     order.Append(estimateRange.RangingObjects[j].NumberInSequence);
                 }
                 var sequence = new RangingSequence() { NumbersOrder = order.ToString() };
                 estimateRange.Sequences.Add(sequence);
                 _estimateService.UpdateEstimate(estimateRange).Wait();
             }
-            //_replyService.Create(reply).Wait();
+            AddPostEstimateCount(model.Id);
+            _rating.AddReputationOfEstimate(_userManager.GetUserId(User));
             return RedirectToAction("OpenPostById", "Post", new { id = model.Id });
         }
     }

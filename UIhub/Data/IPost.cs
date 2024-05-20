@@ -8,6 +8,7 @@ namespace UIhub.Data
         Post GetPostById(int id);
         IEnumerable<Post> GetAllPosts();
         Task Create(Post post);
+        Task Update(Post post);
         //IEnumerable<PostReply> GetAllPostReplies(int id);
         //User GetPostAuthorById(int id);
         //IEnumerable<Post> GetAllUserPosts(string userId);
