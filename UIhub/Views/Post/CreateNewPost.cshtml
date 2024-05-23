@@ -1,6 +1,7 @@
-﻿@model UIhub.Models.ViewModels.NewPostViewModel
+﻿
+@model UIhub.Models.ViewModels.NewPostViewModel
 <h1>Создание публикации</h1>
-<form asp-action="PlacePost" method="post">
+<form asp-action="PlacePost" method="post" enctype="multipart/form-data">
     <div class="form-group">
         <label asp-for="Title">Тема</label>
         <input asp-for="Title" class="form-control" required/>
@@ -12,7 +13,7 @@
     <div class="form-group">
         <h4>Автоматическая оценка</h4>
         <p>Загрузите сюда xaml-файлы вашего интерфейса</p>
-        <input type="file" name="uploadedFiles" title=" " multiple accept=".xaml" /><br>
+        <input type="file" name="FormFiles" title=" " multiple accept=".xaml" /><br>
     </div>
     <div class="row">
         <div class="col-3">
@@ -52,4 +53,3 @@
         Разместить
     </button>
 </form>
-

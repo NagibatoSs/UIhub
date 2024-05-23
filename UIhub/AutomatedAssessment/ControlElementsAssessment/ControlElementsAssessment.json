@@ -1,3 +1,24 @@
 {
-
+  "Tags": [
+    "Button",
+    "CheckBox",
+    "RadioButton",
+    "ToggleButton",
+    "RepeatButton",
+    "Expander",
+    "Calendar",
+    "ScrollViewer",
+    "TextBox",
+    "ComboBox",
+    "RichTextBox",
+    "Slider",
+    "DatePicker",
+    "PasswordBox",
+    "TabItem",
+    "TabControl",
+    "Menu",
+    "TreeView"
+  ],
+  "Etalon": 7,
+  "Koef": 0.06
 }

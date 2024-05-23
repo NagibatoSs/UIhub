@@ -1,0 +1,9 @@
+{
+  "Tags": [
+    "TextBox",
+    "Label",
+    "TextBlock"
+  ],
+  "MinusPerParagraph": 1,
+  "WordsInParagraph": 250
+}

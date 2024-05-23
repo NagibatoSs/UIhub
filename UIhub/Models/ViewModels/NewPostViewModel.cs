@@ -15,5 +15,6 @@
         public List<EstimateRanging> EstimatesRanging { get; set; }
         public string EstimateFormat { get; set; }
         public User Author { get; set; }
+        public List<IFormFile> FormFiles { get; set; }
     }
 }

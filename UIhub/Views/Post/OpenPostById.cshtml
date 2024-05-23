@@ -77,13 +77,14 @@
                 @Model.PostViewModel.EstimatesRanging[i].Characteristic
             </h4>
             <div>
-            @for (int k=0;k<3;k++)
+            @for (int k=0; (k<estimate.Contents.Count()) && (k<3) ;k++)
                 {
                     <h3>@(k+1)</h3>
                     <div class="row">
                     @for (int j = 0; j < Model.PostViewModel.EstimatesRanging[i].RangingObjects.Count; j++)
                     {
-                        var index = int.Parse(estimate.Contents[k][j].ToString());
+                            var a = estimate.Contents[k];
+                            var index = int.Parse(a[j].ToString());
                         <div class="col-auto">
                             <p>@Model.PostViewModel.EstimatesRanging[i].RangingObjects[index].Content</p>
                         </div>

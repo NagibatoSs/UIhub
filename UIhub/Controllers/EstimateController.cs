@@ -90,10 +90,9 @@ namespace UIhub.Controllers
                 StringBuilder order = new StringBuilder();
                 for (int j = 0; j < estimateRange.RangingObjects.Count; j++)
                 {
-                    var b = model.PostViewModel.EstimatesRanging[i].RangingObjects[j].NumberInSequence;
-                    var numberByIndex = int.Parse(b) - 1;
-                    estimateRange.RangingObjects[j].NumberInSequence = j.ToString();
-                    order.Append(estimateRange.RangingObjects[j].NumberInSequence);
+                    var numberByIndex = int.Parse(model.PostViewModel.EstimatesRanging[i].RangingObjects[j].NumberInSequence) - 1;
+                    //estimateRange.RangingObjects[j].NumberInSequence = j.ToString();
+                    order.Append(numberByIndex);
                 }
                 var sequence = new RangingSequence() { NumbersOrder = order.ToString() };
                 estimateRange.Sequences.Add(sequence);

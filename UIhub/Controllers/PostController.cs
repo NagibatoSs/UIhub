@@ -70,10 +70,18 @@ namespace UIhub.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> PlacePost(NewPostViewModel model)
+        public async Task<IActionResult> PlacePost(NewPostViewModel model, List<IFormFile> FormFiles)
         {
             var userId = _userManager.GetUserId(User);
             var user = _userManager.FindByIdAsync(userId).Result;
+            if (model.FormFiles != null)
+            {
+                var assessment = new AutoAssessmentController();
+                var results = assessment.AssessFilesAsync(model.FormFiles).Result;
+                AutoAssessmentResult autoAssessment = new AutoAssessmentResult() 
+                { ResultValue = results.Item1, ResultText = results.Item2 };
+                model.AutoAssessment = autoAssessment;
+            };
             var post = BuildPost(model, user);
             _postService.Create(post).Wait();
             return RedirectToAction("OpenPostById", "Post", new { id = post.Id });
@@ -189,47 +197,48 @@ namespace UIhub.Controllers
                 EstimatesResult = new EstimatesResultViewModel(),
                 InterfaceLayouts = post.InterfaceLayouts
             };
-                //if (post.Estimates[0].Discriminator != null)
-                //{
-                //    switch (post.Estimates[0].Discriminator)
-                //    {
-                //        case "EstimateScale":
-                //            model.EstimatesResult.ScaleAverages = new List<double>();
-                //            for (int i = 0; i < post.Estimates.Count; i++)
-                //            {
-                //                model.EstimatesScale.Add(post.Estimates[i] as EstimateScale);
-                //                model.EstimatesResult.ScaleAverages.Add(CalculateScaleAvg(model.EstimatesScale[i]));
-                //            }
-                //            break;
-                //        case "EstimateVoting":
-                //            foreach (var item in post.Estimates)
-                //                model.EstimatesVoting.Add(item as EstimateVoting);
-                //            string json = JsonConvert.SerializeObject(model.EstimatesVoting);
-                //            ViewBag.Voting = json;
-                //            break;
-                //        case "EstimateRanging":
-                //            model.RangingEstimatesPresenter = new List<RangingEstimatePresenterViewModel>();
-                //            foreach (var item in post.Estimates)
-                //            {
-                //                var estRange = item as EstimateRanging;
-                //                model.EstimatesRanging.Add(estRange);
-                //            }
-                //            for (int i =0;i<model.EstimatesRanging.Count;i++)
-                //            {
-                //                List<string> mostCommon = new List<string>();
-                //                mostCommon.AddRange(
-                //                    model.EstimatesRanging[i].Sequences
-                //                    .GroupBy(s => s.NumbersOrder)
-                //                    .OrderByDescending(grp => grp.Count())
-                //                    .Select(grp => grp.Key)
-                //                    .Take(3));
+            if (post.Estimates[0].Discriminator != null)
+            {
+                switch (post.Estimates[0].Discriminator)
+                {
+                    case "EstimateScale":
+                        model.EstimatesResult.ScaleAverages = new List<double>();
+                        for (int i = 0; i < post.Estimates.Count; i++)
+                        {
+                            model.EstimatesScale.Add(post.Estimates[i] as EstimateScale);
+                            model.EstimatesResult.ScaleAverages.Add(CalculateScaleAvg(model.EstimatesScale[i]));
+                        }
+                        break;
+                    case "EstimateVoting":
+                        foreach (var item in post.Estimates)
+                            model.EstimatesVoting.Add(item as EstimateVoting);
+                        string json = JsonConvert.SerializeObject(model.EstimatesVoting);
+                        ViewBag.Voting = json;
+                        break;
+                    case "EstimateRanging":
+                        model.RangingEstimatesPresenter = new List<RangingEstimatePresenterViewModel>();
+                        foreach (var item in post.Estimates)
+                        {
+                            var estRange = item as EstimateRanging;
+                            model.EstimatesRanging.Add(estRange);
+                        }
+                        for (int i = 0; i < model.EstimatesRanging.Count; i++)
+                        {
+                            List<string> mostCommon = new List<string>();
+                            mostCommon.AddRange(
+                                model.EstimatesRanging[i].Sequences
+                                .GroupBy(s => s.NumbersOrder)
+                                .OrderByDescending(grp => grp.Count())
+                                .Select(grp => grp.Key)
+                                .Take(3));
 
-                //                model.RangingEstimatesPresenter.Add(new RangingEstimatePresenterViewModel { Contents = mostCommon });
+                            model.RangingEstimatesPresenter.Add(new RangingEstimatePresenterViewModel { Contents = mostCommon });
 
-                //            }
-                //            break;
-                //    }
-                //}
+                        }
+                        var rg = 23;
+                        break;
+                }
+            }
             return model;
         }
         private double CalculateScaleAvg(EstimateScale scale)

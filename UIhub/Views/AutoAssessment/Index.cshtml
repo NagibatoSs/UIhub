@@ -1,0 +1,13 @@
+﻿<div class="text-center">
+    <h1 class="display-5">Автоматическое оценивание</h1>
+</div>
+<div class="text-black">
+    <p>Загрузите сюда xaml-файлы вашего интерфейса</p>
+</div>
+<form asp-action="Index" asp-controller="AutoAssessment" method="post" enctype="multipart/form-data">
+    <input type="file" name="uploadedFiles" title=" " required multiple accept=".xaml" /><br>
+    <input type="submit" value="Загрузить" />
+</form>
+<div>
+    @ViewBag.Message
+</div>
