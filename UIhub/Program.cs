@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using UIhub.Data;
@@ -14,7 +15,13 @@ builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 //builder.Services.AddDefaultIdentity<User>(options => options.SignIn.RequireConfirmedAccount = false)
 //    .AddEntityFrameworkStores<ApplicationDbContext>();
-builder.Services.AddDefaultIdentity<User>(options => options.SignIn.RequireConfirmedAccount = false).AddEntityFrameworkStores<ApplicationDbContext>();
+//builder.Services.AddIdentity<User, IdentityRole>(options => options.SignIn.RequireConfirmedAccount = false)
+//    .AddEntityFrameworkStores<ApplicationDbContext>();
+
+builder.Services.AddIdentity<User, IdentityRole>()
+    .AddDefaultTokenProviders()
+    .AddDefaultUI().
+    AddEntityFrameworkStores<ApplicationDbContext>();
 
 builder.Services.AddScoped<IPost, PostService>();
 builder.Services.AddScoped<IPostReply, PostReplyService>();
@@ -22,6 +29,7 @@ builder.Services.AddScoped<IUser, UserService>();
 builder.Services.AddScoped<IUserRank, UserRankService>();
 builder.Services.AddScoped<IEstimate, EstimateService>();
 
+builder.Services.AddRazorPages();
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
@@ -44,15 +52,13 @@ app.UseStaticFiles();
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
-
-app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Post}/{action=MainPage}/{id?}");
-//app.UseEndpoints(endpoints =>
-//{
-//    endpoints.MapControllerRoute("default", "{controller=Post}/{action=MainPage}/{id?}");
-//    endpoints.MapControllerRoute("admin", "{controller=Home}/{action=Index}/{id?}");
-//});
+//app.MapControllerRoute(
+//    name: "default",
+//    pattern: "{controller=Post}/{action=MainPage}/{id?}");
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapControllerRoute("default", "{controller=Post}/{action=MainPage}/{id?}");
+});
 app.MapRazorPages();
 
 app.Run();

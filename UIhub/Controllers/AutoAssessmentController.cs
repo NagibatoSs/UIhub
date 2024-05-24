@@ -3,13 +3,20 @@ using UIhub.AutomatedAssessment.ControlElementsAssessment;
 using UIhub.AutomatedAssessment;
 using System.Text;
 using UIhub.AutomatedAssessment.LongParagraphsAssessment;
+using Microsoft.AspNetCore.Identity;
+using UIhub.Models;
+using UIhub.Data;
+using System.Security.Claims;
 
 namespace UIhub.Controllers
 {
     public class AutoAssessmentController: Controller
     {
-        public AutoAssessmentController()
+        UserManager<User> _userManager;
+        IUser _userService;
+        public AutoAssessmentController(UserManager<User> userManager)
         {
+            _userManager = userManager;
         }
         public IActionResult Index()
         {
@@ -86,6 +93,45 @@ namespace UIhub.Controllers
                 { }
             }
             return Tuple.Create(rate/successAssesmentCount, assessmentRes.ToString());
+        }
+        [HttpPost]
+        public async Task<IActionResult> AddAssessmentFilesAsync(IFormFile csFile, IFormFile jsonFile)
+        {
+
+            if (!User.Identity.IsAuthenticated)
+            {
+                ViewBag.Message = "Необходима авторизация!";
+                return View();
+            }
+            var user = _userManager.FindByIdAsync(_userManager.GetUserId(User)).Result;
+            var roles = _userManager.GetRolesAsync(user).Result;
+            if (roles.Contains("admin"))
+            {
+                string uploadFolder = Path.Combine(Directory.GetCurrentDirectory() + @"\AutomatedAssessment",
+                    csFile.FileName.Substring(0,(csFile.FileName.Length)-3));
+                if (!Directory.Exists(uploadFolder))
+                {
+                    Directory.CreateDirectory(uploadFolder);
+                }
+                string fileName = Path.GetFileName(csFile.FileName);
+                string fileSavePath = Path.Combine(uploadFolder, fileName);
+                using (FileStream stream = new FileStream(fileSavePath, FileMode.Create))
+                {
+                    await csFile.CopyToAsync(stream);
+                }
+                fileName = Path.GetFileName(jsonFile.FileName);
+                fileSavePath = Path.Combine(uploadFolder, fileName);
+                using (FileStream stream = new FileStream(fileSavePath, FileMode.Create))
+                {
+                    await jsonFile.CopyToAsync(stream);
+                }
+                ViewBag.Message = "Файлы успешно добавлены!";
+            }
+            else
+            {
+                ViewBag.Message = "У вас нет прав на совершение данной операции";
+            }
+            return View();
         }
     }
 }

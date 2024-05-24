@@ -31,7 +31,11 @@ namespace UIhub.Service
             _context.Update(post);
             await _context.SaveChangesAsync();
         }
-
+        public void Delete(Post post)
+        {
+            _context.Posts.Remove(post);
+            _context.SaveChanges();
+        }
         public Post GetPostById(int id)
         {
             IQueryable<Post> posts = _context.Posts

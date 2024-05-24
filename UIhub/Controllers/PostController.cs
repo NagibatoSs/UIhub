@@ -58,6 +58,22 @@ namespace UIhub.Controllers
             };
             return View(model);
         }
+        //[HttpPost]
+        //public IActionResult EditPost()
+        //{
+
+        //}
+        public IActionResult DeletePost(bool confirm, int id)
+        {
+            if (User.IsInRole("admin"))
+            {
+                if (confirm)
+                {
+                    _postService.Delete(_postService.GetPostById(id));
+                }
+            }
+            return RedirectToAction("MainPage");
+        }
         public IActionResult CreateNewPost(NewPostViewModel model = null)
         {
             if (model == null)
@@ -76,7 +92,7 @@ namespace UIhub.Controllers
             var user = _userManager.FindByIdAsync(userId).Result;
             if (model.FormFiles != null)
             {
-                var assessment = new AutoAssessmentController();
+                var assessment = new AutoAssessmentController(_userManager);
                 var results = assessment.AssessFilesAsync(model.FormFiles).Result;
                 AutoAssessmentResult autoAssessment = new AutoAssessmentResult() 
                 { ResultValue = results.Item1, ResultText = results.Item2 };
@@ -197,7 +213,7 @@ namespace UIhub.Controllers
                 EstimatesResult = new EstimatesResultViewModel(),
                 InterfaceLayouts = post.InterfaceLayouts
             };
-            if (post.Estimates[0].Discriminator != null)
+            if (post.Estimates.Any() && post.Estimates[0].Discriminator != null)
             {
                 switch (post.Estimates[0].Discriminator)
                 {
@@ -212,7 +228,12 @@ namespace UIhub.Controllers
                     case "EstimateVoting":
                         foreach (var item in post.Estimates)
                             model.EstimatesVoting.Add(item as EstimateVoting);
-                        string json = JsonConvert.SerializeObject(model.EstimatesVoting);
+                        string json = JsonConvert.SerializeObject(model.EstimatesVoting, Formatting.Indented,
+                                new JsonSerializerSettings
+                                {
+                                    PreserveReferencesHandling = PreserveReferencesHandling.Objects
+                                    });
+                        //string json = JsonConvert.SerializeObject(model.EstimatesVoting);
                         ViewBag.Voting = json;
                         break;
                     case "EstimateRanging":

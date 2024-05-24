@@ -1,6 +1,17 @@
 ﻿<div class="text-center">
     <h1 class="display-5">Автоматическое оценивание</h1>
 </div>
+@if (User.Identity.IsAuthenticated && User.IsInRole("admin"))
+{
+    <form method="post" asp-action="AddAssessmentFiles" enctype="multipart/form-data">
+            <h3>Добавить файлы для автоматической оценки</h3>
+            <p>Cs-файл</p>
+        <input type="file" name="csFile" required accept=".cs" />
+            <p>Json-файл</p>
+        <input type="file" name="jsonFile" required accept=".json" />
+        <input type="submit" value="Загрузить" />
+    </form>
+}
 <div class="text-black">
     <p>Загрузите сюда xaml-файлы вашего интерфейса</p>
 </div>

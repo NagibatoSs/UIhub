@@ -1,11 +1,30 @@
 ﻿@model UIhub.Models.ViewModels.PostContentViewModel
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+@if (User.Identity.IsAuthenticated && 
+    (User.IsInRole("admin") || (Model.PostViewModel.Author.Id == Model.CurrentUserId)))
+{
+    <form asp-controller="Post" asp-action="EditPost" method="post">
+        <input asp-for="Id" type="hidden" value="@Model.Id" />
+        <button type="submit">Редактировать публикацию</button>
+    </form>
+    <form asp-controller="Post" asp-action="DeletePost" method="post">
+        <input asp-for="Id" type="hidden" value="@Model.Id" />
+        @Html.ActionLink(
+                "Удалить публикацию",
+                "DeletePost",
+                "Post",
+                new { confirm = true, id = @Model.Id },
+                new { onclick = "return confirm('Вы действительно хотите удалить публикацию?')" })
+        @* <button type="submit">Удалить публикацию</button> *@
+    </form>
+}
 <h1>@Model.PostViewModel.Title</h1>
 <h3>@Model.PostViewModel.Description</h3>
 <p>Дата создания: @Model.PostViewModel.Created</p>
 <p>Создал: @Model.PostViewModel.Author.UserName</p>
 <p>Просмотров: @Model.PostViewModel.Views</p>
 <p>Оценок: @Model.PostViewModel.EstimateCount</p>
+@* Макеты интерфейсов *@
 @if (Model.PostViewModel.InterfaceLayouts.Any())
 {
     <table class="table table-hover" id="postIndexTable">
@@ -21,15 +40,17 @@
         </tbody>
     </table>
 }
-
+@* Результаты оценок для автора поста *@
 @if (Model.CurrentUserId!= null && Model.PostViewModel.Author.Id == Model.CurrentUserId)
 {
+    @* Результаты автоматической оценки *@
     @if (Model.PostViewModel.AutoAssessment != null)
     {
         <p>Автоматическая оценка</p>
         <p>Итоговая оценка: @Model.PostViewModel.AutoAssessment.ResultValue</p>
         <p>@Model.PostViewModel.AutoAssessment.ResultText</p>
     }
+    @* Результаты шкалы *@
     @if (Model.PostViewModel.EstimatesScale.Any())
     {
         @for (int i = 0; i < Model.PostViewModel.EstimatesScale.Count(); i++)
@@ -50,6 +71,7 @@
             </div>
         }
     }
+    @* Результаты голосования *@
      @if (Model.PostViewModel.EstimatesVoting.Any())
     {
         @for (int i = 0; i < Model.PostViewModel.EstimatesVoting.Count(); i++)
@@ -67,6 +89,7 @@
             </div>
         }
     }
+    @* Результаты ранжирования *@
     @if (Model.PostViewModel.EstimatesRanging.Any())
     {
         <h3>Самые распространенные последовательности</h3>
@@ -95,10 +118,12 @@
         }
     }
 }
+@* Оценивание для экспертов *@
 else 
 {
     @if (Model.PostViewModel.EstimatesScale.Any())
 {
+   @*  Оценивание шкала *@
     <form asp-controller="Estimate" asp-action="SetScaleEstimate" method="post">
         @for (int i = 0; i < Model.PostViewModel.EstimatesScale.Count; i++)
         {
@@ -118,6 +143,7 @@ else
     </form>
 }
 
+@* Оценивание голосование *@
 @if (Model.PostViewModel.EstimatesVoting.Any())
 {
     <form asp-controller="Estimate" asp-action="SetVotingEstimate" method="post">
@@ -140,7 +166,7 @@ else
         </div>
     </form>
 }
-
+    @* Оценивание ранжирование*@
 @if (Model.PostViewModel.EstimatesRanging.Any())
 {
     <form asp-controller="Estimate" asp-action="SetRangingEstimate" method="post">
@@ -164,6 +190,7 @@ else
     </form>
 }
 }
+@* Текстовые ответы форма ввода *@
 @if (User.Identity.IsAuthenticated)
 {
     <form asp-controller="PostReply" asp-action="PlaceReply" method="post">
@@ -181,6 +208,7 @@ else
 {
     <p>Авторизуйтесь, чтобы оставить ответ</p>
 }
+@* Текстовые ответы вывод *@
 @if (Model.PostViewModel.Replies.Any())
 {
     <table class="table table-hover">
