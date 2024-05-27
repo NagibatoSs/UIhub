@@ -1,0 +1,53 @@
+﻿@model UIhub.Models.ViewModels.NewPostViewModel
+<h1>Редактирование публикации</h1>
+<h3>Автор: @Model.Author.UserName</h3>
+<form asp-action="UpdatePost" method="post" enctype="multipart/form-data">
+    <div class="form-group">
+        <label asp-for="Title">Тема</label>
+        <input asp-for="Title" class="form-control" required/>
+    </div>
+    <div class="form-group">
+        <label asp-for="Description">Описание</label>
+        <textarea asp-for="Description" class="form-control" required></textarea>
+    </div>
+    <div class="row">
+        <div class="col-3">
+            @for (int i=0;i<Model.InterfaceLayoutsSrc.Count;i++)
+            {
+                <input type="text" class="form-control" id="InterfaceLayoutsSrc[@i]" asp-for="InterfaceLayoutsSrc[i]" />
+            }
+        </div>
+        <div id="layoutsFields" class="col-9"></div>
+    </div>
+        <h5>Формат обратной связи</h5>
+    <div>
+        @if (Model.EstimatesScale.Any())
+        {
+            <label for="scale">Шкала оценки</label>
+            @for (int i = 0; i < Model.EstimatesScale.Count; i++)
+            {
+                <input type="text" class="form-control" asp-for="EstimatesScale[i].Characteristic" placeholder="Характеристика" />
+            }
+        }
+        @if (Model.EstimatesVoting.Any())
+        {
+            <label for="scale">Голосование</label>
+            @for (int i = 0; i < Model.EstimatesVoting.Count; i++)
+            {
+                <input class="form-control vote" type="text" placeholder="Характеристика" asp-for="EstimatesVoting[i].Characteristic">
+            }
+        }
+        @if (Model.EstimatesRanging.Any())
+        {
+            <label for="scale">Ранжирование</label>
+            @for (int i = 0; i < Model.EstimatesRanging.Count; i++)
+            {
+                <input class="form-control vote" type="text" placeholder="Характеристика для ранжирования" asp-for="EstimatesRanging[i].Characteristic">
+            }
+        }
+    </div>
+    <input asp-for="Id" type="hidden" value="@Model.Id" />
+    <button type="submit" class="btn-primary">
+        Сохранить
+    </button>
+</form>

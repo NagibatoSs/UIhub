@@ -64,7 +64,6 @@ function newScaleFields() {
     let field = document.createElement("input");
     field.setAttribute("class", "form-control");
     field.setAttribute("id", "EstimatesScale[0]");
-    //field.setAttribute("name", "Estimates[1].Characteristic");
     field.setAttribute("name", "EstimatesScale[0].Characteristic");
     field.setAttribute("type", "text");
     field.setAttribute("placeholder", "Характеристика");

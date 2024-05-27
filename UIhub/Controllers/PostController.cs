@@ -58,11 +58,90 @@ namespace UIhub.Controllers
             };
             return View(model);
         }
-        //[HttpPost]
-        //public IActionResult EditPost()
-        //{
+        [HttpPost]
+        public IActionResult EditPost(int id)
+        {
+            var post = _postService.GetPostById(id);
+            var model = new NewPostViewModel
+            {
+                Id = id,
+                Title = post.Title,
+                Description = post.Description,
+                EstimateCount = post.EstimateCount,
+                Author = post.Author,
+                Created = post.Created,
+                EstimateFormat = post.Estimates[0].Discriminator,
+                EstimatesRanging = new List<EstimateRanging>(),
+                EstimatesScale = new List<EstimateScale>(),
+                EstimatesVoting = new List<EstimateVoting>()
+            };
 
-        //}
+            model.InterfaceLayoutsSrc = post.InterfaceLayouts.Select(l => l.SourceUrl).ToList();
+            switch (model.EstimateFormat)
+            {
+                case "EstimateScale":
+                    foreach (var estimate in post.Estimates)
+                    {
+                        if (estimate.Characteristic == null) continue;
+                        var scale = new EstimateScale { Characteristic = estimate.Characteristic };
+                        model.EstimatesScale.Add(scale);
+                    }
+                    break;
+                case "EstimateVoting":
+                    foreach (var estimate in post.Estimates)
+                    {
+                        if (estimate.Characteristic == null) continue;
+                        var voting = new EstimateVoting { Characteristic = estimate.Characteristic};
+                        model.EstimatesVoting.Add(voting);
+                    }
+                    break;
+                case "EstimateRanging":
+                    foreach (var estimate in post.Estimates)
+                    {
+                        if (estimate.Characteristic == null) continue;
+                        var ranging = new EstimateRanging { Characteristic = estimate.Characteristic };
+                        model.EstimatesRanging.Add(ranging);
+                    }
+                    break;
+            }
+            return View(model);
+        }
+        [HttpPost]
+        public IActionResult UpdatePost(NewPostViewModel model)
+        {
+            var post = _postService.GetPostById(model.Id);
+            post.Title = model.Title;
+            post.Description = model.Description;
+            post.InterfaceLayouts = new List<InterfaceLayout>();
+            string postFormat = post.Estimates[0].Discriminator;
+            foreach (var l in model.InterfaceLayoutsSrc)
+            {
+                post.InterfaceLayouts.Add(new InterfaceLayout { SourceUrl = l });
+            }
+            switch (postFormat)
+            {
+                case "EstimateScale":
+                    for (int i=0;i<post.Estimates.Count;i++)
+                    {
+                        post.Estimates[i].Characteristic = model.EstimatesScale[i].Characteristic;
+                    }
+                    break;
+                case "EstimateVoting":
+                    for (int i = 0; i < post.Estimates.Count; i++)
+                    {
+                        post.Estimates[i].Characteristic = model.EstimatesVoting[i].Characteristic;
+                    }
+                    break;
+                case "EstimateRanging":
+                    for (int i = 0; i < post.Estimates.Count; i++)
+                    {
+                        post.Estimates[i].Characteristic = model.EstimatesRanging[i].Characteristic;
+                    }
+                    break;
+            }
+            _postService.Update(post).Wait();
+            return RedirectToAction("OpenPostById", "Post", new { id = post.Id });
+        }
         public IActionResult DeletePost(bool confirm, int id)
         {
             if (User.IsInRole("admin"))
@@ -78,7 +157,7 @@ namespace UIhub.Controllers
         {
             if (model == null)
             {
-                model = CreateNewPostViewModel();
+                model = new NewPostViewModel();
             }
             if (model.InterfaceLayoutsSrc == null)
                 model.InterfaceLayoutsSrc = new List<string>();
@@ -187,11 +266,6 @@ namespace UIhub.Controllers
         }
 
 
-        private NewPostViewModel CreateNewPostViewModel()
-        {
-            return new NewPostViewModel();
-        }
-
         private PostViewModel CreatePostViewModel(int id)
         {
             var post = _postService.GetPostById(id);
@@ -228,12 +302,17 @@ namespace UIhub.Controllers
                     case "EstimateVoting":
                         foreach (var item in post.Estimates)
                             model.EstimatesVoting.Add(item as EstimateVoting);
+                        //string json = JsonConvert.SerializeObject(model.EstimatesVoting, Formatting.Indented,
+                        //        new JsonSerializerSettings
+                        //        {
+                        //            PreserveReferencesHandling = PreserveReferencesHandling.Objects
+                        //        });
                         string json = JsonConvert.SerializeObject(model.EstimatesVoting, Formatting.Indented,
-                                new JsonSerializerSettings
-                                {
-                                    PreserveReferencesHandling = PreserveReferencesHandling.Objects
-                                    });
-                        //string json = JsonConvert.SerializeObject(model.EstimatesVoting);
+                        new JsonSerializerSettings()
+                        {
+                            ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
+                        }
+                        );
                         ViewBag.Voting = json;
                         break;
                     case "EstimateRanging":
