@@ -10,22 +10,21 @@ using UIhub.Rating;
 
 namespace UIhub.Controllers
 {
-    public class EstimateController : Controller
+//    var user = _userManager.FindByIdAsync(_userManager.GetUserId(User)).Result;
+//    estimateScale.UserEstimates.Add(new UserEstimate { Estimate = estimateScale, User = user });
+public class EstimateController : Controller
     {
         private readonly IEstimate _estimateService;
         private readonly IPost _postService;
         private readonly UserManager<User> _userManager;
         private readonly IUser _userService;
-        private readonly IUserRank _userRankService;
-        private readonly RatingAccrual _rating;
-        public EstimateController(IEstimate estimateService, UserManager<User> userManager, IPost postService, IUser userService, IUserRank userRankService)
+        
+        public EstimateController(IEstimate estimateService, UserManager<User> userManager, IPost postService, IUser userService)
         {
             _estimateService = estimateService;
             _userManager = userManager;
             _postService = postService;
             _userService = userService;
-            _userRankService = userRankService;
-            _rating = new RatingAccrual(_userManager, _userService, _userRankService);
         }
         [HttpPost]
         public async Task<IActionResult> SetScaleEstimate(PostContentViewModel model)
@@ -54,9 +53,17 @@ namespace UIhub.Controllers
                 }
                 _estimateService.UpdateEstimate(estimateScale).Wait();
             }
+            AddUserPostEstimate(model.Id);
             AddPostEstimateCount(model.Id);
-            _rating.AddReputationOfEstimate(_userManager.GetUserId(User));
+            _userService.IncreaseReputationForEstimate(_userManager.GetUserId(User));
             return RedirectToAction("OpenPostById", "Post", new { id = model.Id });
+        }
+        private void AddUserPostEstimate(int postId)
+        {
+            var user = _userManager.FindByIdAsync(_userManager.GetUserId(User)).Result;
+            var post = _postService.GetPostById(postId);
+            post.UserPostEstimates.Add(new UserPostEstimate { Post = post, User = user });
+            _postService.Update(post).Wait();
         }
         private void AddPostEstimateCount(int id)
         {
@@ -75,8 +82,9 @@ namespace UIhub.Controllers
                 estimateVote.VotingObjects[int.Parse(modelVoting.SelectedValue)].VoteCount++;
                 _estimateService.UpdateEstimate(estimateVote).Wait();
             }
+            AddUserPostEstimate(model.Id);
             AddPostEstimateCount(model.Id);
-            _rating.AddReputationOfEstimate(_userManager.GetUserId(User));
+            _userService.IncreaseReputationForEstimate(_userManager.GetUserId(User));
             return RedirectToAction("OpenPostById", "Post", new { id = model.Id });
         }
 
@@ -98,8 +106,9 @@ namespace UIhub.Controllers
                 estimateRange.Sequences.Add(sequence);
                 _estimateService.UpdateEstimate(estimateRange).Wait();
             }
+            AddUserPostEstimate(model.Id);
             AddPostEstimateCount(model.Id);
-            _rating.AddReputationOfEstimate(_userManager.GetUserId(User));
+            _userService.IncreaseReputationForEstimate(_userManager.GetUserId(User));
             return RedirectToAction("OpenPostById", "Post", new { id = model.Id });
         }
     }

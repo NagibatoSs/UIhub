@@ -29,7 +29,7 @@ function newImgField() {
     let field = document.createElement("input");
     field.setAttribute("class", "form-control");
     field.setAttribute("id", "InterfaceLayoutsSrc[" + nextFieldId + "]");
-    field.setAttribute("name", "InterfaceLayoutsSrc");
+    field.setAttribute("name", "ImgFormFile");
     field.setAttribute("type", "file");
     field.setAttribute("placeholder", "Загрузите файл-изображения");
     field.setAttribute("asp-for", "InterfaceLayoutsSrc[" + nextFieldId + "]");
@@ -389,4 +389,6 @@ function drawVoting(id, estimatesVoting) {
     drawDoughnut(id, dataValues, labels)
 }
 
-
+document.querySelector('.like-button').addEventListener('click', (e) => {
+    e.currentTarget.classList.toggle('liked');
+});

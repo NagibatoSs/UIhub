@@ -13,12 +13,13 @@
     <div class="form-group">
         <h4>Автоматическая оценка</h4>
         <p>Загрузите сюда xaml-файлы вашего интерфейса</p>
-        <input type="file" name="FormFiles" title=" " multiple accept=".xaml" /><br>
+        <input class="form-control" type="file" name="FormFiles" title=" " multiple accept=".xaml" /><br>
     </div>
     <div class="row">
         <div class="col-3">
             <input type="button" class="btn btn-primary" value="Добавить ссылку Figma" onclick="newFigmaField()" style="margin: 10px" />
-            <input type="button" class="btn btn-primary" value="Добавить изображение" onclick="newImgField()" />
+@*             <input type="button" class="btn btn-primary" value="Добавить изображение" onclick="newImgField()" /> *@
+            <input class="form-control" name="ImgFormFiles" multiple type="file" placeholder="Загрузите изображения интерфейса" accept=".png,.jpeg,.jpg">
         </div>
         <div id="layoutsFields" class="col-9"></div>
     </div>

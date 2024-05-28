@@ -9,5 +9,7 @@ namespace UIhub.Models
         public virtual UserRank Rank { get; set; }
         public virtual List<Post>? Post { get; set; }
         public virtual List<PostReply>? PostReplies { get; set; }
+        public virtual List<UserPostEstimate>? UserPostEstimates { get; set; }
+        public virtual List<PostReplyLike>? PostReplyLikes { get; set; }
     }
 }

@@ -10,6 +10,7 @@ namespace UIhub.Data
         Task Create(Post post);
         Task Update(Post post);
         void Delete(Post post);
+        Task SetInterfaceImage(int id, Uri uri);
         //IEnumerable<PostReply> GetAllPostReplies(int id);
         //User GetPostAuthorById(int id);
         //IEnumerable<Post> GetAllUserPosts(string userId);

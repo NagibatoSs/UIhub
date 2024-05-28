@@ -42,6 +42,8 @@ namespace UIhub.Service
                 .Where(post => post.Id == id)
                 .Include(post => post.Replies)
                    .ThenInclude(r => r.Author)
+                 .Include(post => post.Replies)
+                   .ThenInclude(r => r.PostReplyLikes)
                 .Include(post => post.Author)
                     .ThenInclude(a => a.Rank)
                 .Include(post => post.InterfaceLayouts)
@@ -51,8 +53,16 @@ namespace UIhub.Service
                 .Include(post => post.Estimates)
                     .ThenInclude(est => (est as EstimateRanging).RangingObjects)
                 .Include(post => post.Estimates)
-                    .ThenInclude(est => (est as EstimateRanging).Sequences);
+                    .ThenInclude(est => (est as EstimateRanging).Sequences)
+                .Include(p => p.UserPostEstimates);
             return posts.FirstOrDefault();
+        }
+
+        public async Task SetInterfaceImage(int id, Uri uri)
+        {
+            var post = GetPostById(id);
+            post.InterfaceLayouts.Add(new InterfaceLayout { SourceUrl = uri.AbsoluteUri });
+            await Update(post);
         }
     }
 }

@@ -8,5 +8,6 @@
         public int LikesCount { get; set; }
         public virtual User Author { get; set; }
         public virtual Post Post { get; set; }
+        public virtual List<PostReplyLike>? PostReplyLikes { get; set; }
     }
 }

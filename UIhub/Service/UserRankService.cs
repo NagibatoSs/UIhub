@@ -13,10 +13,6 @@ namespace UIhub.Service
         public IEnumerable<UserRank> GetAllRanks()
         {
             return _context.UserRanks;
-            //return _context.PostTextReplies
-            //  .Where(reply => reply.Post.Id == postId)
-            //  .Include(reply => reply.Post)
-            //  .Include(reply => reply.Author);
         }
         public UserRank GetRank(int id)
         {

@@ -20,6 +20,8 @@ namespace UIhub.Data
         public DbSet<EstimateRanging> EstimateRangings { get; set; }
         public DbSet<RangingSequence> RangingSequences { get; set; }
         public DbSet<RangingObject> RangingObjects { get; set; }
+        public DbSet<UserPostEstimate> UserPostEstimates {  get; set; }
+        public DbSet<PostReplyLike> PostReplyLikes { get; set; }
 
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)

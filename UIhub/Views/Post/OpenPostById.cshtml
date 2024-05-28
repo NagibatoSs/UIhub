@@ -15,7 +15,6 @@
                 "Post",
                 new { confirm = true, id = @Model.Id },
                 new { onclick = "return confirm('Вы действительно хотите удалить публикацию?')" })
-        @* <button type="submit">Удалить публикацию</button> *@
     </form>
 }
 <h1>@Model.PostViewModel.Title</h1>
@@ -32,7 +31,15 @@
             {
                 <tr>
                     <td>
-                        @Html.Raw(layout.SourceUrl)
+                        @if (layout.SourceType == "figma")
+                            @Html.Raw(layout.SourceUrl)
+                        else
+                        {
+                           @*  <div style="background-image: url(@layout.SourceUrl)"></div> *@
+                            <img class="fit-picture"
+                                 src="/Interfaces/@layout.SourceUrl"
+                                 alt="Interface files" />
+                        }
                     </td>
                 </tr>
             }
@@ -45,9 +52,9 @@
     @* Результаты автоматической оценки *@
     @if (Model.PostViewModel.AutoAssessment != null)
     {
-        <p>Автоматическая оценка</p>
-        <p>Итоговая оценка: @Model.PostViewModel.AutoAssessment.ResultValue</p>
-        <p>@Model.PostViewModel.AutoAssessment.ResultText</p>
+        <h3>Автоматическая оценка</h3>
+        <p>@Html.Raw(@Model.PostViewModel.AutoAssessment.ResultText)</p>
+        <p><b>Итоговая оценка: @Model.PostViewModel.AutoAssessment.ResultValue</b></p>
     }
     @* Результаты шкалы *@
     @if (Model.PostViewModel.EstimatesScale.Any())
@@ -120,74 +127,79 @@
 @* Оценивание для экспертов *@
 else 
 {
-    @if (Model.PostViewModel.EstimatesScale.Any())
-{
-   @*  Оценивание шкала *@
-    <form asp-controller="Estimate" asp-action="SetScaleEstimate" method="post">
-        @for (int i = 0; i < Model.PostViewModel.EstimatesScale.Count; i++)
+    @if (Model.IsPostEstimatedByUser == false)
+    {
+        @if (Model.PostViewModel.EstimatesScale.Any())
         {
-            <p>@Model.PostViewModel.EstimatesScale[i].Characteristic</p>
-                <input type="radio" value="1" name="Model.NewScaleEstimateViewModel[@i].SelectedValue" />
-                <input type="radio" value="2" name="Model.NewScaleEstimateViewModel[@i].SelectedValue" />
-                <input type="radio" value="3" name="Model.NewScaleEstimateViewModel[@i].SelectedValue" />
-                <input type="radio" value="4" name="Model.NewScaleEstimateViewModel[@i].SelectedValue" />
-                <input type="radio" value="5" name="Model.NewScaleEstimateViewModel[@i].SelectedValue" />
-            <input type="hidden" name="Model.NewScaleEstimateViewModel[@i].Characteristic" value="@Model.PostViewModel.EstimatesScale[i].Characteristic" />
-            <input type="hidden" name="Model.PostViewModel.EstimatesScale[@i].Id" value="@Model.PostViewModel.EstimatesScale[i].Id" />
+            @*  Оценивание шкала *@
+            <form asp-controller="Estimate" asp-action="SetScaleEstimate" method="post">
+                @for (int i = 0; i < Model.PostViewModel.EstimatesScale.Count; i++)
+                {
+                    <p>@Model.PostViewModel.EstimatesScale[i].Characteristic
+                    </p>
+                    <input type="radio" value="1" name="Model.NewScaleEstimateViewModel[@i].SelectedValue" />
+                    <input type="radio" value="2" name="Model.NewScaleEstimateViewModel[@i].SelectedValue" />
+                    <input type="radio" value="3" name="Model.NewScaleEstimateViewModel[@i].SelectedValue" />
+                    <input type="radio" value="4" name="Model.NewScaleEstimateViewModel[@i].SelectedValue" />
+                    <input type="radio" value="5" name="Model.NewScaleEstimateViewModel[@i].SelectedValue" />
+                    <input type="hidden" name="Model.NewScaleEstimateViewModel[@i].Characteristic" value="@Model.PostViewModel.EstimatesScale[i].Characteristic" />
+                    <input type="hidden" name="Model.PostViewModel.EstimatesScale[@i].Id" value="@Model.PostViewModel.EstimatesScale[i].Id" />
+                }
+                <input type="hidden" name="Model.Id" value="@Model.Id" />
+                <div>
+                    <button type="submit">Отправить оценку</button>
+                </div>
+            </form>
         }
-        <input type="hidden" name="Model.Id" value="@Model.Id" />
-        <div>
-            <button type="submit">Отправить оценку</button>
-        </div>
-    </form>
-}
 
-@* Оценивание голосование *@
-@if (Model.PostViewModel.EstimatesVoting.Any())
-{
-    <form asp-controller="Estimate" asp-action="SetVotingEstimate" method="post">
-        @for (int i = 0; i < Model.PostViewModel.EstimatesVoting.Count; i++)
+        @* Оценивание голосование *@
+        @if (Model.PostViewModel.EstimatesVoting.Any())
         {
-            <p>
-                @Model.PostViewModel.EstimatesVoting[i].Characteristic
-            </p>
-                @for (int j = 0; j < Model.PostViewModel.EstimatesVoting[i].VotingObjects.Count; j++)
-            {
-                    <p>@Model.PostViewModel.EstimatesVoting[i].VotingObjects[j].Content</p>
-                    <input type="radio" value="@j" name="Model.NewVotingEstimateViewModel[@i].SelectedValue" />
-            }
-            <input type="hidden" name="Model.NewVotingEstimateViewModel[@i].Characteristic" value="@Model.PostViewModel.EstimatesVoting[i].Characteristic" />
-            <input type="hidden" name="Model.PostViewModel.EstimatesVoting[@i].Id" value="@Model.PostViewModel.EstimatesVoting[i].Id" />
+            <form asp-controller="Estimate" asp-action="SetVotingEstimate" method="post">
+                @for (int i = 0; i < Model.PostViewModel.EstimatesVoting.Count; i++)
+                {
+                    <p>
+                        @Model.PostViewModel.EstimatesVoting[i].Characteristic
+                    </p>
+                    @for (int j = 0; j < Model.PostViewModel.EstimatesVoting[i].VotingObjects.Count; j++)
+                    {
+                        <p>@Model.PostViewModel.EstimatesVoting[i].VotingObjects[j].Content</p>
+                        <input type="radio" value="@j" name="Model.NewVotingEstimateViewModel[@i].SelectedValue" />
+                    }
+                    <input type="hidden" name="Model.NewVotingEstimateViewModel[@i].Characteristic" value="@Model.PostViewModel.EstimatesVoting[i].Characteristic" />
+                    <input type="hidden" name="Model.PostViewModel.EstimatesVoting[@i].Id" value="@Model.PostViewModel.EstimatesVoting[i].Id" />
+                }
+                <input type="hidden" name="Model.Id" value="@Model.Id" />
+                <div>
+                    <button type="submit">Отправить оценку</button>
+                </div>
+            </form>
         }
-        <input type="hidden" name="Model.Id" value="@Model.Id" />
-        <div>
-            <button type="submit">Отправить оценку</button>
-        </div>
-    </form>
-}
-    @* Оценивание ранжирование*@
-@if (Model.PostViewModel.EstimatesRanging.Any())
-{
-    <form asp-controller="Estimate" asp-action="SetRangingEstimate" method="post">
-        @for (int i = 0; i < Model.PostViewModel.EstimatesRanging.Count; i++)
+        @* Оценивание ранжирование*@
+        @if (Model.PostViewModel.EstimatesRanging.Any())
         {
-            <p>
-                @Model.PostViewModel.EstimatesRanging[i].Characteristic
-            </p>
-            @for (int j = 0; j < Model.PostViewModel.EstimatesRanging[i].RangingObjects.Count; j++)
-            {
-                <p>@Model.PostViewModel.EstimatesRanging[i].RangingObjects[j].Content</p>
-                <input type="number" name="Model.PostViewModel.EstimatesRanging[@i].RangingObjects[@j].NumberInSequence" step="1" min="1" max="@Model.PostViewModel.EstimatesRanging[i].RangingObjects.Count"/>
-            }
-            <input type="hidden" name="Model.NewRangingEstimateViewModel[@i].Characteristic" value="@Model.PostViewModel.EstimatesRanging[i].Characteristic" />
-            <input type="hidden" name="Model.PostViewModel.EstimatesRanging[@i].Id" value="@Model.PostViewModel.EstimatesRanging[i].Id" />
+            <form asp-controller="Estimate" asp-action="SetRangingEstimate" method="post">
+                @for (int i = 0; i < Model.PostViewModel.EstimatesRanging.Count; i++)
+                {
+                    <p>
+                        @Model.PostViewModel.EstimatesRanging[i].Characteristic
+                    </p>
+                    @for (int j = 0; j < Model.PostViewModel.EstimatesRanging[i].RangingObjects.Count; j++)
+                    {
+                        <p>@Model.PostViewModel.EstimatesRanging[i].RangingObjects[j].Content
+                        </p>
+                        <input type="number" name="Model.PostViewModel.EstimatesRanging[@i].RangingObjects[@j].NumberInSequence" step="1" min="1" max="@Model.PostViewModel.EstimatesRanging[i].RangingObjects.Count"/>
+                    }
+                    <input type="hidden" name="Model.NewRangingEstimateViewModel[@i].Characteristic" value="@Model.PostViewModel.EstimatesRanging[i].Characteristic" />
+                    <input type="hidden" name="Model.PostViewModel.EstimatesRanging[@i].Id" value="@Model.PostViewModel.EstimatesRanging[i].Id" />
+                }
+                <input type="hidden" name="Model.Id" value="@Model.Id" />
+                <div>
+                    <button type="submit">Отправить оценку</button>
+                </div>
+            </form>
         }
-        <input type="hidden" name="Model.Id" value="@Model.Id" />
-        <div>
-            <button type="submit">Отправить оценку</button>
-        </div>
-    </form>
-}
+    }
 }
 @* Текстовые ответы форма ввода *@
 @if (User.Identity.IsAuthenticated)
@@ -229,7 +241,29 @@ else
                         @reply.Created
                     </td>
                     <td>
-                        <p>Лайки: </p>@reply.LikesCount
+                        @reply.LikesCount
+                    </td>
+                    <td>
+                        <form asp-controller="PostReply" asp-action="SetLike" asp-route-id="@reply.Id">
+                            @if (reply.PostReplyLikes.Any())
+                            {
+                                @if (reply.PostReplyLikes.Select(r => r.User.Id).Contains(Model.CurrentUserId))
+                                {
+                                    <input type="hidden" name="isLike" value="false" />
+                                    <button type="post" class="dislike-button"></button>
+                                }
+                                else
+                                {
+                                    <input type="hidden" name="isLike" value="true" />
+                                    <button type="post" class="like-button"></button>
+                                }
+                            }
+                            else
+                            {
+                                <input type="hidden" name="isLike" value="true" />
+                                <button type="post" class="like-button"></button>
+                            }
+                        </form>
                     </td>
                 </tr>
             }

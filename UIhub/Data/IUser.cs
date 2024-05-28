@@ -9,6 +9,9 @@ namespace UIhub.Data
         IEnumerable<PostReply> GetAllUserPostsRepliesById(string id);
         IEnumerable<User> GetAllUsers();
         Task Update(User user);
+        User GetUserByEmail(string email);
+        void IncreaseReputationForEstimate(string id);
+        void IncreaseReputationForLike(string id);
         //Post GetPostById(int id);
         //IEnumerable<Post> GetAllPosts();
         //IEnumerable<PostReply> GetAllPostsReplies();

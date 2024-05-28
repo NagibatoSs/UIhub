@@ -28,16 +28,15 @@ namespace UIhub.Controllers
             StringBuilder rateMessage = new StringBuilder();
             foreach (var uploadedFile in uploadedFiles)
             {
-                rateMessage.Append(uploadedFile.FileName + " ");
+                rateMessage.AppendLine(uploadedFile.FileName + "</br>");
                 string fileContents = await GetFileText(uploadedFile);
                 var assessmentNames = GetAssessmentNames();
                 var assessment = GetAssessmentResult(fileContents, assessmentNames);
-                rateMessage.Append(assessment.Item2);
+                rateMessage.Append(assessment.Item2 + "</br>");
                 resultRate += assessment.Item1;
             }
             resultRate /= uploadedFiles.Count;
-            rateMessage.Append("Результирующий балл = " + Math.Round(resultRate, 1));
-            return Tuple.Create(resultRate, rateMessage.ToString());
+            return Tuple.Create(Math.Round(resultRate,1), rateMessage.ToString());
         }
         public async Task<string> GetFileText(IFormFile uploadedFile)
         {
@@ -84,15 +83,15 @@ namespace UIhub.Controllers
                     var ctor = type.GetConstructor(new Type[] { });
                     var result = ctor.Invoke(new object[] { });
                     var assessment = (Tuple<double, string>)type.GetMethod("DoAssessment").Invoke(result, new object[] { fileContents });
-                    assessmentRes.Append(assessment.Item2);/* + " Оценка по критерию: " + assessment.Item1);*/
-                    assessmentRes.AppendLine("\n");
+                    //assessmentRes.Append(string.Format("{0} </br>", assessment.Item2));
+                    assessmentRes.Append(assessment.Item2 + "<br/>");/* + " Оценка по критерию: " + assessment.Item1);*/
                     rate += assessment.Item1;
                     successAssesmentCount++;
                 }
                 catch
                 { }
             }
-            return Tuple.Create(rate/successAssesmentCount, assessmentRes.ToString());
+            return Tuple.Create(Math.Round(rate/successAssesmentCount,1), assessmentRes.ToString());
         }
         [HttpPost]
         public async Task<IActionResult> AddAssessmentFilesAsync(IFormFile csFile, IFormFile jsonFile)

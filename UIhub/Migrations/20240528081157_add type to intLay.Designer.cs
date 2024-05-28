@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using UIhub.Data;
 
@@ -11,9 +12,11 @@ using UIhub.Data;
 namespace UIhub.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240528081157_add type to intLay")]
+    partial class addtypetointLay
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -262,6 +265,9 @@ namespace UIhub.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("Views")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("AuthorId");
@@ -302,29 +308,6 @@ namespace UIhub.Migrations
                     b.HasIndex("PostId");
 
                     b.ToTable("PostTextReplies");
-                });
-
-            modelBuilder.Entity("UIhub.Models.PostReplyLike", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("PostReplyId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("PostReplyId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("PostReplyLikes");
                 });
 
             modelBuilder.Entity("UIhub.Models.RangingObject", b =>
@@ -449,29 +432,6 @@ namespace UIhub.Migrations
                     b.HasIndex("RankId");
 
                     b.ToTable("AspNetUsers", (string)null);
-                });
-
-            modelBuilder.Entity("UIhub.Models.UserPostEstimate", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("PostId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("PostId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("UserPostEstimates");
                 });
 
             modelBuilder.Entity("UIhub.Models.UserRank", b =>
@@ -656,23 +616,6 @@ namespace UIhub.Migrations
                     b.Navigation("Post");
                 });
 
-            modelBuilder.Entity("UIhub.Models.PostReplyLike", b =>
-                {
-                    b.HasOne("UIhub.Models.PostReply", "PostReply")
-                        .WithMany("PostReplyLikes")
-                        .HasForeignKey("PostReplyId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("UIhub.Models.User", "User")
-                        .WithMany("PostReplyLikes")
-                        .HasForeignKey("UserId");
-
-                    b.Navigation("PostReply");
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("UIhub.Models.RangingObject", b =>
                 {
                     b.HasOne("UIhub.Models.EstimateRanging", null)
@@ -698,23 +641,6 @@ namespace UIhub.Migrations
                     b.Navigation("Rank");
                 });
 
-            modelBuilder.Entity("UIhub.Models.UserPostEstimate", b =>
-                {
-                    b.HasOne("UIhub.Models.Post", "Post")
-                        .WithMany("UserPostEstimates")
-                        .HasForeignKey("PostId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("UIhub.Models.User", "User")
-                        .WithMany("UserPostEstimates")
-                        .HasForeignKey("UserId");
-
-                    b.Navigation("Post");
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("UIhub.Models.VotingObject", b =>
                 {
                     b.HasOne("UIhub.Models.EstimateVoting", null)
@@ -729,13 +655,6 @@ namespace UIhub.Migrations
                     b.Navigation("InterfaceLayouts");
 
                     b.Navigation("Replies");
-
-                    b.Navigation("UserPostEstimates");
-                });
-
-            modelBuilder.Entity("UIhub.Models.PostReply", b =>
-                {
-                    b.Navigation("PostReplyLikes");
                 });
 
             modelBuilder.Entity("UIhub.Models.User", b =>
@@ -743,10 +662,6 @@ namespace UIhub.Migrations
                     b.Navigation("Post");
 
                     b.Navigation("PostReplies");
-
-                    b.Navigation("PostReplyLikes");
-
-                    b.Navigation("UserPostEstimates");
                 });
 
             modelBuilder.Entity("UIhub.Models.EstimateRanging", b =>

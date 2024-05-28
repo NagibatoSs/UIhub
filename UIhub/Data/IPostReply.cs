@@ -10,6 +10,8 @@ namespace UIhub.Data
         IEnumerable<PostReply> GetAllPostsReplies();
 
         Task Create(PostReply postReply);
+        Task Update(PostReply postReply);
+        PostReplyLike GetPostReplyLikeById(int replyId, string userId);
         //Task Delete(int postReplyId);
     }
 }

@@ -1,4 +1,4 @@
-html {
+﻿html {
   font-size: 14px;
 }
 
@@ -19,4 +19,73 @@ html {
 
 body {
   margin-bottom: 60px;
+}
+
+.like-button {
+    display: inline-block;
+    position: relative;
+    font-size: 32px;
+    cursor: pointer;
+    border-style: none;
+    // border: 1px solid black;
+    &::before
+
+{
+    font-size: 1em;
+    color: #000;
+    content: '♥';
+    position: absolute;
+    left: 0%;
+    top: -200%;
+    transform: translate(-50%, -50%);
+}
+
+&::after {
+    font-size: 1em;
+    color: #ff3252;
+    content: '♥';
+    position: absolute;
+    left: 0%;
+    top: -200%;
+    transform: translate(-50%, -50%) scale(0);
+    transition: transform 0.2s;
+}
+
+&.liked::after {
+    transform: translate(-50%, -50%) scale(1.1);
+}
+}
+.dislike-button {
+    display: inline-block;
+    position: relative;
+    font-size: 32px;
+    cursor: pointer;
+    border-style: none;
+    // border: 1px solid black;
+    &::before
+
+{
+    font-size: 1em;
+    color: #ff3252;
+    content: '♥';
+    position: absolute;
+    left: 0%;
+    top: -200%;
+    transform: translate(-50%, -50%);
+}
+
+&::after {
+    font-size: 1em;
+    color: #000;
+    content: '♥';
+    position: absolute;
+    left: 0%;
+    top: -200%;
+    transform: translate(-50%, -50%) scale(0);
+    transition: transform 0.2s;
+}
+
+&.liked::after {
+    transform: translate(-50%, -50%) scale(1.1);
+}
 }

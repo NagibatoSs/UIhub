@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Hosting;
 using UIhub.Data;
 using UIhub.Models;
 using UIhub.Models.ViewModels;
@@ -25,6 +26,26 @@ namespace UIhub.Controllers
             return View();
         }
         [HttpPost]
+        public IActionResult SetLike(int id, bool isLike)
+        {
+            var reply = _replyService.GetPostReplyById(id);
+            var user = _userManager.FindByIdAsync(_userManager.GetUserId(User)).Result;
+            if (reply.PostReplyLikes == null)
+                reply.PostReplyLikes = new List<PostReplyLike>();
+            if (isLike)
+            {
+                reply.LikesCount += 1;
+                reply.PostReplyLikes.Add(new PostReplyLike { PostReply = reply, User = user });
+            }
+            else
+            {
+                reply.LikesCount -= 1;
+                reply.PostReplyLikes.Remove(_replyService.GetPostReplyLikeById(reply.Id,user.Id));
+            }
+            _replyService.Update(reply).Wait();
+            return RedirectToAction("OpenPostById", "Post", new { id = reply.Post.Id });
+        }
+        [HttpPost]
         public IActionResult PlaceReply(PostContentViewModel model)
         {
             var modelReply = model.NewReplyModel;
@@ -47,7 +68,8 @@ namespace UIhub.Controllers
                 Author = user,
                 Post = model.Post,
                 Created = DateTime.Now,
-                LikesCount = 0
+                LikesCount = 0,
+                PostReplyLikes = new List<PostReplyLike>()
             };
             return reply;
         }

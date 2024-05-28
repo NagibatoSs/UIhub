@@ -10,5 +10,6 @@
         public List<NewVotingEstimateViewModel> NewVotingEstimateViewModel { get; set; }
         public List<NewRangingEstimateViewModel> NewRangingEstimateViewModel { get; set; }
         public string CurrentUserId { get; set; }
+        public bool IsPostEstimatedByUser { get; set; }
     }
 }

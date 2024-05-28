@@ -9,6 +9,12 @@ using UIhub.Service;
 using System.Text;
 using Newtonsoft.Json;
 using System.Collections.Generic;
+using System;
+using UIhub.AutomatedAssessment.ControlElementsAssessment;
+using UIhub.AutomatedAssessment.LongParagraphsAssessment;
+using UIhub.AutomatedAssessment;
+using System.IO;
+using Microsoft.Extensions.Hosting;
 
 namespace UIhub.Controllers
 {
@@ -16,14 +22,18 @@ namespace UIhub.Controllers
     {
         private readonly IPost _postService;
         private readonly UserManager<User> _userManager;
+        private readonly IWebHostEnvironment _webHost;
 
-        public PostController(IPost postService, UserManager<User> userManager)
+        public PostController(IPost postService, UserManager<User> userManager, IWebHostEnvironment webHost)
         {
             _postService = postService;
             _userManager = userManager;
+            _webHost = webHost;
         }
         public IActionResult MainPage()
         {
+            if (_postService.GetAllPosts() == null)
+                return View();
             var posts = _postService
                .GetAllPosts()
                .Select(post => new PostsListViewModel()
@@ -32,7 +42,6 @@ namespace UIhub.Controllers
                    Title = post.Title,
                    AuthorName = post.Author.UserName,
                    Created = post.Created.ToString("U"),
-                   Views = post.Views,
                    EstimateCount = post.EstimateCount,
                    isTop = post.IsTop
                })
@@ -43,7 +52,6 @@ namespace UIhub.Controllers
             };
             return View(model);
         }
-        //var user = _userManager.FindByIdAsync(userId).Result;
         public IActionResult OpenPostById(int id)
         {
             if (id == 0)
@@ -56,6 +64,11 @@ namespace UIhub.Controllers
                 PostViewModel = postModel,
                 CurrentUserId = userId
             };
+            var user = _userManager.FindByIdAsync(_userManager.GetUserId(User)).Result;
+            model.IsPostEstimatedByUser = _postService.GetPostById(id)
+                .UserPostEstimates
+                .Select(e => e.User)
+                .Contains(user);
             return View(model);
         }
         [HttpPost]
@@ -148,7 +161,19 @@ namespace UIhub.Controllers
             {
                 if (confirm)
                 {
-                    _postService.Delete(_postService.GetPostById(id));
+                    var post = _postService.GetPostById(id);
+                    string folder = Path.Combine(_webHost.WebRootPath, "Interfaces");
+                    DirectoryInfo directoryInfo = new DirectoryInfo(folder);
+                    var files = directoryInfo.GetFiles();
+                    var removingFiles = post.InterfaceLayouts.Select(l => l.SourceUrl).Where(url => files.Select(f=>f.Name).Contains(url));
+                    FileInfo fileInf;
+                    foreach (var file in removingFiles)
+                    {
+                        fileInf = new FileInfo(Path.Combine(folder,file));
+                        if (fileInf.Exists)
+                            fileInf.Delete();
+                    }
+                    _postService.Delete(post);
                 }
             }
             return RedirectToAction("MainPage");
@@ -165,7 +190,7 @@ namespace UIhub.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> PlacePost(NewPostViewModel model, List<IFormFile> FormFiles)
+        public async Task<IActionResult> PlacePost(NewPostViewModel model)
         {
             var userId = _userManager.GetUserId(User);
             var user = _userManager.FindByIdAsync(userId).Result;
@@ -234,7 +259,6 @@ namespace UIhub.Controllers
                 Description = model.Description,
                 Author = user,
                 Created = DateTime.Now,
-                Views = 0,
                 EstimateCount = 0,
                 IsTop = model.IsTop,
                 InterfaceLayouts = new List<InterfaceLayout>(),
@@ -246,11 +270,30 @@ namespace UIhub.Controllers
             {
                 foreach (var content in model.InterfaceLayoutsSrc)
                 {
-                    var layoutSrc = new InterfaceLayout() { SourceUrl = content };
+                    var layoutSrc = new InterfaceLayout() { SourceUrl = content, SourceType = "figma" };
                     post.InterfaceLayouts.Add(layoutSrc);
                 }
             }
-            switch(model.EstimateFormat)
+            if (model.ImgFormFiles != null)
+            {
+                string uploadFolder = Path.Combine(_webHost.WebRootPath, "Interfaces");
+                if (!Directory.Exists(uploadFolder))
+                {
+                    Directory.CreateDirectory(uploadFolder);
+                }
+
+                foreach (var uploadedFile in model.ImgFormFiles)
+                {
+                    string fileName = Path.GetFileName(DateTime.Now.ToString("yyyyMMddHHmmss") + uploadedFile.FileName);
+                    string fileSavePath = Path.Combine(uploadFolder, fileName);
+                    using (FileStream stream = new FileStream(fileSavePath, FileMode.Create))
+                    {
+                        uploadedFile.CopyToAsync(stream).Wait();
+                    }
+                    post.InterfaceLayouts.Add(new InterfaceLayout { SourceUrl = fileName, SourceType = "img" });
+                }
+            };
+            switch (model.EstimateFormat)
             {
                 case "scale":
                     BuildEstimateScale(post, model);
@@ -274,7 +317,6 @@ namespace UIhub.Controllers
                 Id = post.Id,
                 Title = post.Title,
                 Description = post.Description,
-                Views = post.Views,
                 EstimateCount = post.EstimateCount,
                 Created = post.Created.ToString("U"),
                 Author = post.Author,
@@ -302,11 +344,6 @@ namespace UIhub.Controllers
                     case "EstimateVoting":
                         foreach (var item in post.Estimates)
                             model.EstimatesVoting.Add(item as EstimateVoting);
-                        //string json = JsonConvert.SerializeObject(model.EstimatesVoting, Formatting.Indented,
-                        //        new JsonSerializerSettings
-                        //        {
-                        //            PreserveReferencesHandling = PreserveReferencesHandling.Objects
-                        //        });
                         string json = JsonConvert.SerializeObject(model.EstimatesVoting, Formatting.Indented,
                         new JsonSerializerSettings()
                         {
@@ -345,12 +382,13 @@ namespace UIhub.Controllers
         {
             double avg = 0;
             int count = scale.Count_1 + scale.Count_2 + scale.Count_3 + scale.Count_4 + scale.Count_5;
+            if (count == 0) return 0;
             avg += scale.Count_1 * 1;
             avg += scale.Count_2 * 2;
             avg += scale.Count_3 * 3;
             avg += scale.Count_4 * 4;
             avg += scale.Count_5 * 5;
-            return (Math.Round(avg / count, 2));
+            return Math.Round(avg / count, 1);
         }
 
     }

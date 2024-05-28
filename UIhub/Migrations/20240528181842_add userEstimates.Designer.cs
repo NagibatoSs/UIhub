@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using UIhub.Data;
 
@@ -11,9 +12,11 @@ using UIhub.Data;
 namespace UIhub.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240528181842_add userEstimates")]
+    partial class adduserEstimates
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -304,29 +307,6 @@ namespace UIhub.Migrations
                     b.ToTable("PostTextReplies");
                 });
 
-            modelBuilder.Entity("UIhub.Models.PostReplyLike", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("PostReplyId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("PostReplyId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("PostReplyLikes");
-                });
-
             modelBuilder.Entity("UIhub.Models.RangingObject", b =>
                 {
                     b.Property<int>("Id")
@@ -451,7 +431,7 @@ namespace UIhub.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
-            modelBuilder.Entity("UIhub.Models.UserPostEstimate", b =>
+            modelBuilder.Entity("UIhub.Models.UserEstimate", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -459,7 +439,7 @@ namespace UIhub.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("PostId")
+                    b.Property<int>("EstimateId")
                         .HasColumnType("int");
 
                     b.Property<string>("UserId")
@@ -467,11 +447,11 @@ namespace UIhub.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("PostId");
+                    b.HasIndex("EstimateId");
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("UserPostEstimates");
+                    b.ToTable("UserEstimates");
                 });
 
             modelBuilder.Entity("UIhub.Models.UserRank", b =>
@@ -656,23 +636,6 @@ namespace UIhub.Migrations
                     b.Navigation("Post");
                 });
 
-            modelBuilder.Entity("UIhub.Models.PostReplyLike", b =>
-                {
-                    b.HasOne("UIhub.Models.PostReply", "PostReply")
-                        .WithMany("PostReplyLikes")
-                        .HasForeignKey("PostReplyId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("UIhub.Models.User", "User")
-                        .WithMany("PostReplyLikes")
-                        .HasForeignKey("UserId");
-
-                    b.Navigation("PostReply");
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("UIhub.Models.RangingObject", b =>
                 {
                     b.HasOne("UIhub.Models.EstimateRanging", null)
@@ -698,19 +661,19 @@ namespace UIhub.Migrations
                     b.Navigation("Rank");
                 });
 
-            modelBuilder.Entity("UIhub.Models.UserPostEstimate", b =>
+            modelBuilder.Entity("UIhub.Models.UserEstimate", b =>
                 {
-                    b.HasOne("UIhub.Models.Post", "Post")
-                        .WithMany("UserPostEstimates")
-                        .HasForeignKey("PostId")
+                    b.HasOne("UIhub.Models.Estimate", "Estimate")
+                        .WithMany("UserEstimates")
+                        .HasForeignKey("EstimateId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("UIhub.Models.User", "User")
-                        .WithMany("UserPostEstimates")
+                        .WithMany("UserEstimates")
                         .HasForeignKey("UserId");
 
-                    b.Navigation("Post");
+                    b.Navigation("Estimate");
 
                     b.Navigation("User");
                 });
@@ -722,6 +685,11 @@ namespace UIhub.Migrations
                         .HasForeignKey("EstimateVotingId");
                 });
 
+            modelBuilder.Entity("UIhub.Models.Estimate", b =>
+                {
+                    b.Navigation("UserEstimates");
+                });
+
             modelBuilder.Entity("UIhub.Models.Post", b =>
                 {
                     b.Navigation("Estimates");
@@ -729,13 +697,6 @@ namespace UIhub.Migrations
                     b.Navigation("InterfaceLayouts");
 
                     b.Navigation("Replies");
-
-                    b.Navigation("UserPostEstimates");
-                });
-
-            modelBuilder.Entity("UIhub.Models.PostReply", b =>
-                {
-                    b.Navigation("PostReplyLikes");
                 });
 
             modelBuilder.Entity("UIhub.Models.User", b =>
@@ -744,9 +705,7 @@ namespace UIhub.Migrations
 
                     b.Navigation("PostReplies");
 
-                    b.Navigation("PostReplyLikes");
-
-                    b.Navigation("UserPostEstimates");
+                    b.Navigation("UserEstimates");
                 });
 
             modelBuilder.Entity("UIhub.Models.EstimateRanging", b =>

@@ -16,11 +16,23 @@ namespace UIhub.Service
             _context.Add(postReply);
             await _context.SaveChangesAsync();
         }
+        public async Task Update(PostReply postReply)
+        {
+            _context.Update(postReply);
+            await _context.SaveChangesAsync();
+        }
+        public PostReplyLike GetPostReplyLikeById(int replyId, string userId)
+        {
+            return _context.PostReplyLikes
+                 .Where(like => like.PostReply.Id == replyId && like.User.Id == userId)
+                 .FirstOrDefault();
+        }
         public IEnumerable<PostReply> GetAllRepliesByPostId(int postId)
         {
             return _context.PostTextReplies
                 .Where(reply => reply.Post.Id == postId)
                 .Include(reply => reply.Post)
+                .Include(u => u.PostReplyLikes)
                 .Include(reply => reply.Author);
         }
 
@@ -37,7 +49,8 @@ namespace UIhub.Service
                 .Where(reply => reply.Id == id)
                 .Include(post => post.Author)
                     .ThenInclude(a => a.Rank)
-                .Include(post => post.Post);
+                .Include(post => post.Post)
+                .Include(u => u.PostReplyLikes);
             //.Include(post => post.Replies)
             //   .ThenInclude(r => r.Author)
             //.Include(post => post.Author);
