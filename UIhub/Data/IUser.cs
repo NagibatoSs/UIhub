@@ -12,6 +12,7 @@ namespace UIhub.Data
         User GetUserByEmail(string email);
         void IncreaseReputationForEstimate(string id);
         void IncreaseReputationForLike(string id);
+        public bool BuyTop(string userId);
         //Post GetPostById(int id);
         //IEnumerable<Post> GetAllPosts();
         //IEnumerable<PostReply> GetAllPostsReplies();

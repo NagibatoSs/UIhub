@@ -29,20 +29,27 @@ namespace UIhub.Controllers
         public IActionResult SetLike(int id, bool isLike)
         {
             var reply = _replyService.GetPostReplyById(id);
+            if (!User.Identity.IsAuthenticated)
+                return RedirectToAction("OpenPostById", "Post", new { id = reply.Post.Id });
             var user = _userManager.FindByIdAsync(_userManager.GetUserId(User)).Result;
+            if (user.Reputation < 2)
+            {
+                return RedirectToAction("OpenPostById", "Post", new { id = reply.Post.Id });
+            }
             if (reply.PostReplyLikes == null)
                 reply.PostReplyLikes = new List<PostReplyLike>();
             if (isLike)
             {
+                _userService.IncreaseReputationForLike(reply.Author.Id);
                 reply.LikesCount += 1;
                 reply.PostReplyLikes.Add(new PostReplyLike { PostReply = reply, User = user });
+                _replyService.Update(reply).Wait();
             }
-            else
-            {
-                reply.LikesCount -= 1;
-                reply.PostReplyLikes.Remove(_replyService.GetPostReplyLikeById(reply.Id,user.Id));
-            }
-            _replyService.Update(reply).Wait();
+            //else
+            //{
+            //    reply.LikesCount -= 1;
+            //    reply.PostReplyLikes.Remove(_replyService.GetPostReplyLikeById(reply.Id,user.Id));
+            //}
             return RedirectToAction("OpenPostById", "Post", new { id = reply.Post.Id });
         }
         [HttpPost]

@@ -46,6 +46,16 @@ namespace UIhub.Service
         {
             return _context.Users.Where(u => u.Email.Equals(email)).FirstOrDefault();
         }
+        public bool BuyTop(string userId)
+        {
+            var user = GetUserById(userId);
+            if (user.Points < 2)
+                return false;
+            user.Points -= 2;
+            CheckUserRate(user);
+            Update(user).Wait();
+            return true;
+        }
         public void IncreaseReputationForEstimate(string userId)
         {
             var user = GetUserById(userId);

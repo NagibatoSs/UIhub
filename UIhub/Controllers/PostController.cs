@@ -23,12 +23,14 @@ namespace UIhub.Controllers
         private readonly IPost _postService;
         private readonly UserManager<User> _userManager;
         private readonly IWebHostEnvironment _webHost;
+        private readonly IUser _userService;
 
-        public PostController(IPost postService, UserManager<User> userManager, IWebHostEnvironment webHost)
+        public PostController(IPost postService, UserManager<User> userManager, IWebHostEnvironment webHost, IUser userService)
         {
             _postService = postService;
             _userManager = userManager;
             _webHost = webHost;
+            _userService = userService;
         }
         public IActionResult MainPage()
         {
@@ -202,6 +204,10 @@ namespace UIhub.Controllers
                 { ResultValue = results.Item1, ResultText = results.Item2 };
                 model.AutoAssessment = autoAssessment;
             };
+            if (model.IsTop)
+            {
+                model.IsTop = _userService.BuyTop(userId);
+            }
             var post = BuildPost(model, user);
             _postService.Create(post).Wait();
             return RedirectToAction("OpenPostById", "Post", new { id = post.Id });

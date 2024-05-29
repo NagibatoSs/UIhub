@@ -244,26 +244,28 @@ else
                         @reply.LikesCount
                     </td>
                     <td>
-                        <form asp-controller="PostReply" asp-action="SetLike" asp-route-id="@reply.Id">
-                            @if (reply.PostReplyLikes.Any())
-                            {
-                                @if (reply.PostReplyLikes.Select(r => r.User.Id).Contains(Model.CurrentUserId))
+                        @if (Model.CurrentUserId != reply.Author.Id)
+                        {
+                            <form asp-controller="PostReply" asp-action="SetLike" asp-route-id="@reply.Id">
+                                @if (reply.PostReplyLikes != null)
                                 {
-                                    <input type="hidden" name="isLike" value="false" />
-                                    <button type="post" class="dislike-button"></button>
+                                    @if (!reply.PostReplyLikes.Select(r => r.User.Id).Contains(Model.CurrentUserId))
+                                    {
+                                        <input type="hidden" name="isLike" value="true" />
+                                        <button type="post" class="like-button"></button>
+                                    }
+                                    else
+                                    {
+                                        <input type="hidden" name="isLike" value="false" />
+                                        <button type="post" class="dislike-button"></button>
+                                    }
                                 }
-                                else
-                                {
-                                    <input type="hidden" name="isLike" value="true" />
-                                    <button type="post" class="like-button"></button>
-                                }
-                            }
-                            else
-                            {
-                                <input type="hidden" name="isLike" value="true" />
-                                <button type="post" class="like-button"></button>
-                            }
-                        </form>
+                            </form>
+                        }
+                        else
+                        {
+                            <button type="button" disabled class="like-button"></button>
+                        }
                     </td>
                 </tr>
             }
