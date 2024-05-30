@@ -11,20 +11,21 @@
         <textarea asp-for="Description" class="form-control" required></textarea>
     </div>
     <div class="form-group">
-        <h4>Автоматическая оценка</h4>
+        <h3>Автоматическая оценка</h3>
         <p>Загрузите сюда xaml-файлы вашего интерфейса</p>
         <input class="form-control" type="file" name="FormFiles" title=" " multiple accept=".xaml" /><br>
     </div>
+    <h4>Макеты интерфейса</h4>
     <div class="row">
         <div class="col-3">
-            <input type="button" class="btn btn-primary" value="Добавить ссылку Figma" onclick="newFigmaField()" style="margin: 10px" />
-            <input class="form-control" name="ImgFormFiles" multiple type="file" placeholder="Загрузите изображения интерфейса" accept=".png,.jpeg,.jpg">
+            <input data-toggle="tooltip" data-placement="top" title="Зайдите в Figma-проект -> Prototype View -> Share prototype -> Get embed code" type="button" class="btn btn-primary" value="Добавить ссылку Figma" onclick="newFigmaField()" style="margin-bottom: 10px" />
+            <p>Загрузите сюда изображения вашего интерфейса</p>
+            <input data-toggle="tooltip" data-placement="top" title="Поддерживаемые форматы: .png, .jpeg, .jpg" class="form-control" name="ImgFormFiles" multiple type="file" placeholder="Загрузите изображения интерфейса" accept=".png,.jpeg,.jpg">
         </div>
         <div id="layoutsFields" class="col-9"></div>
     </div>
-    
     <div>
-        <h5>Формат обратной связи</h5>
+        <h4 style="margin-top:10px">Формат обратной связи</h4>
         <input type="radio" value="scale" id="scale" name="EstimateFormat" asp-for="EstimateFormat" checked onclick="newEstimateFields(this.id)" />
         <label for="scale">Шкала оценки</label>
 
@@ -34,22 +35,22 @@
         <input type="radio" value="ranging" id="ranging" asp-for="EstimateFormat" name="EstimateFormat" onclick="newEstimateFields(this.id)" />
         <label for="ranging">Ранжирование</label>
 
-        <div id="formatContent" class="row">
-            <div class="col-auto">
+        <div id="formatContent" class="row" style="margin-top:10px">
+            <div class="col-auto" style="margin-bottom:10px">
                 <p>Добавить шкалу</p>
             </div>
-            <div class="col-auto">
-                <button type="button" id="newScaleBtn" onclick="newScale()">+</button>
+            <div class="col-auto" style="margin-bottom:10px">
+                <button type="button" class="btn btn-outline-secondary btn-sm" id="newScaleBtn" onclick="newScale()">+</button>
             </div>
             <div class="form-group">
-                    <input type="text" class="form-control" id="EstimatesScale[0]" asp-for="EstimatesScale[0].Characteristic" placeholder="Характеристика"/>
+                <input type="text" style="margin-bottom:10px" class="form-control" id="EstimatesScale[0]" asp-for="EstimatesScale[0].Characteristic" placeholder="Характеристика" />
             </div>
         </div>
         <div class="row">
-            <p>Вывести публикацию в топ за @RatingData.TopCost баллов</p>
-            <input type="checkbox" asp-for="IsTop">
+            <p class="col-auto">Вывести публикацию в топ за @RatingData.TopCost баллов</p>
+            <input class="col-auto" type="checkbox" asp-for="IsTop">
         </div>
-    <button type="submit" class="btn-primary">
+    <button type="submit" class="btn btn-primary">
         Разместить
     </button>
 </form>

@@ -1,6 +1,6 @@
 ﻿@model UIhub.Models.ViewModels.NewPostViewModel
 <h1>Редактирование публикации</h1>
-<h3>Автор: @Model.Author.UserName</h3>
+<h5>Автор: @Model.Author.UserName</h5>
 <form asp-action="UpdatePost" method="post" enctype="multipart/form-data">
     <div class="form-group">
         <label asp-for="Title">Тема</label>
@@ -10,15 +10,20 @@
         <label asp-for="Description">Описание</label>
         <textarea asp-for="Description" class="form-control" required></textarea>
     </div>
-    <div class="row">
-        <div class="col-3">
-            @for (int i=0;i<Model.InterfaceLayoutsSrc.Count;i++)
-            {
-                <input type="text" class="form-control" id="InterfaceLayoutsSrc[@i]" asp-for="InterfaceLayoutsSrc[i]" />
-            }
-        </div>
+    @if (Model.InterfaceLayoutsSrc != null && Model.InterfaceLayoutsSrc.Any())
+    {
+        <div class="row">
+            <div class="col-3">
+                <h5>Макеты интерфейса</h5>
+
+                @for (int i = 0; i < Model.InterfaceLayoutsSrc.Count; i++)
+                {
+                    <input type="text" class="form-control" id="InterfaceLayoutsSrc[@i]" asp-for="InterfaceLayoutsSrc[i]" />
+                }
+            </div>
         <div id="layoutsFields" class="col-9"></div>
     </div>
+    }
         <h5>Формат обратной связи</h5>
     <div>
         @if (Model.EstimatesScale.Any())
@@ -26,7 +31,7 @@
             <label for="scale">Шкала оценки</label>
             @for (int i = 0; i < Model.EstimatesScale.Count; i++)
             {
-                <input type="text" class="form-control" asp-for="EstimatesScale[i].Characteristic" placeholder="Характеристика" />
+                <input type="text" style="margin-bottom:10px" class="form-control" asp-for="EstimatesScale[i].Characteristic" placeholder="Характеристика" />
             }
         }
         @if (Model.EstimatesVoting.Any())
@@ -34,7 +39,7 @@
             <label for="scale">Голосование</label>
             @for (int i = 0; i < Model.EstimatesVoting.Count; i++)
             {
-                <input class="form-control vote" type="text" placeholder="Характеристика" asp-for="EstimatesVoting[i].Characteristic">
+                <input class="form-control vote" style="margin-bottom:10px" type="text" placeholder="Характеристика" asp-for="EstimatesVoting[i].Characteristic">
             }
         }
         @if (Model.EstimatesRanging.Any())
@@ -42,12 +47,12 @@
             <label for="scale">Ранжирование</label>
             @for (int i = 0; i < Model.EstimatesRanging.Count; i++)
             {
-                <input class="form-control vote" type="text" placeholder="Характеристика для ранжирования" asp-for="EstimatesRanging[i].Characteristic">
+                <input class="form-control vote" style="margin-bottom:10px" type="text" placeholder="Характеристика для ранжирования" asp-for="EstimatesRanging[i].Characteristic">
             }
         }
     </div>
     <input asp-for="Id" type="hidden" value="@Model.Id" />
-    <button type="submit" class="btn-primary">
+    <button type="submit" class="btn btn-primary">
         Сохранить
     </button>
 </form>

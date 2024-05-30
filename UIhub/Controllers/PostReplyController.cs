@@ -46,11 +46,6 @@ namespace UIhub.Controllers
                 reply.PostReplyLikes.Add(new PostReplyLike { PostReply = reply, User = user });
                 _replyService.Update(reply).Wait();
             }
-            //else
-            //{
-            //    reply.LikesCount -= 1;
-            //    reply.PostReplyLikes.Remove(_replyService.GetPostReplyLikeById(reply.Id,user.Id));
-            //}
             return RedirectToAction("OpenPostById", "Post", new { id = reply.Post.Id });
         }
         [HttpPost]
@@ -59,13 +54,10 @@ namespace UIhub.Controllers
             var modelReply = model.NewReplyModel;
             var userId = _userManager.GetUserId(User);
             var post = _postService.GetPostById(model.Id);
-            //var userId = "8ff7a4c5-33b3-4332-a4d4-979ba86ec589";
-            //var user = _userManager.FindByIdAsync(userId).Result;
             var user = _userService.GetUserById(userId);
             modelReply.Post = post;
             var reply = BuildReply(modelReply, user);
             _replyService.Create(reply).Wait();
-            //сюда юзер рейтинг манипуляции
             return RedirectToAction("OpenPostById", "Post", new { id = post.Id });
         }
         private PostReply BuildReply(NewReplyViewModel model, User user)
