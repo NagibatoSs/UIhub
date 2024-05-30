@@ -61,8 +61,8 @@ namespace UIhub.Service
         {
             return _context.PostTextReplies
                 .Where(rep => rep.Author.Id == userId)
-                .Include(post => post.Author)
-                .Include(post => post.Post);
+                .Include(reply => reply.Author)
+                .Include(reply => reply.Post);
         }
     }
 }

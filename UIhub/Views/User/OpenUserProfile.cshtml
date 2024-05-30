@@ -1,0 +1,59 @@
+﻿@model UIhub.Models.ViewModels.UserViewModel
+<h1>Профиль пользователя</h1>
+<h3>@Model.UserName</h3>
+<h5>Email: @Model.Email</h5>
+<h5><b>@Model.Rank.Name</b></h5>
+<h6>Репутация: @Model.Reputation</h6>
+<h6>Баллы: @Model.Points</h6>
+<h2>Публикации пользователя</h2>
+@if (Model.Posts.Any())
+{
+    <table class="table table-hover" id="postIndexTable">
+        <tbody>
+            @foreach (var post in Model.Posts)
+            {
+                <tr>
+                    <td>
+                        <a asp-controller="Post" asp-action="OpenPostById" asp-route-id="@post.Id">
+                            @post.Title
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>Вы еще пока не разместили ни одной публикации</p>
+}
+<h2>Текстовые ответы пользователя</h2>
+@if (Model.PostReplies.Any())
+{
+    <table class="table table-hover" id="postIndexTable">
+        <tbody>
+            @foreach (var rep in Model.PostReplies)
+            {
+                <tr>
+                    <td>
+                        <a asp-controller="Post" asp-action="OpenPostById" asp-route-id="@rep.Post.Id">
+                            @rep.Post.Title
+                        </a>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        @rep.Content
+                    </td>
+                    <td>
+                        Лайков: @rep.LikesCount
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>Вы еще пока не написали ни одного текстового ответа</p>
+}

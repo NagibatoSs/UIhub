@@ -29,9 +29,9 @@ public class EstimateController : Controller
         [HttpPost]
         public async Task<IActionResult> SetScaleEstimate(PostContentViewModel model)
         {
-            for (int i = 0; i < model.NewScaleEstimateViewModel.Count; i++)
+            for (int i = 0; i < model.NewEstimateViewModel.Count; i++)
             {
-                var modelScale = model.NewScaleEstimateViewModel[i];
+                var modelScale = model.NewEstimateViewModel[i];
                 var estimateScale = (_estimateService.GetEstimate(model.PostViewModel.EstimatesScale[i].Id)) as EstimateScale;
                 switch (modelScale.SelectedValue)
                 {
@@ -75,9 +75,9 @@ public class EstimateController : Controller
         [HttpPost]
         public async Task<IActionResult> SetVotingEstimate(PostContentViewModel model)
         {
-            for (int i = 0; i < model.NewVotingEstimateViewModel.Count; i++)
+            for (int i = 0; i < model.NewEstimateViewModel.Count; i++)
             {
-                var modelVoting = model.NewVotingEstimateViewModel[i];
+                var modelVoting = model.NewEstimateViewModel[i];
                 var estimateVote = _estimateService.GetEstimateVoting(model.PostViewModel.EstimatesVoting[i].Id);
                 estimateVote.VotingObjects[int.Parse(modelVoting.SelectedValue)].VoteCount++;
                 _estimateService.UpdateEstimate(estimateVote).Wait();
@@ -91,9 +91,9 @@ public class EstimateController : Controller
         [HttpPost]
         public async Task<IActionResult> SetRangingEstimate(PostContentViewModel model)
         {
-            for (int i = 0; i < model.NewRangingEstimateViewModel.Count; i++)
+            for (int i = 0; i < model.NewEstimateViewModel.Count; i++)
             {
-                var modelRanging = model.NewRangingEstimateViewModel[i];
+                var modelRanging = model.NewEstimateViewModel[i];
                 var estimateRange = _estimateService.GetEstimateRanging(model.PostViewModel.EstimatesRanging[i].Id);
                 StringBuilder order = new StringBuilder();
                 for (int j = 0; j < estimateRange.RangingObjects.Count; j++)

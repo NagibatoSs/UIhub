@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using UIhub.Data;
 using UIhub.Models;
+using UIhub.Rating;
 
 namespace UIhub.Service
 {
@@ -49,9 +50,9 @@ namespace UIhub.Service
         public bool BuyTop(string userId)
         {
             var user = GetUserById(userId);
-            if (user.Points < 2)
+            if (user.Points < RatingData.TopCost)
                 return false;
-            user.Points -= 2;
+            user.Points -= RatingData.TopCost;
             CheckUserRate(user);
             Update(user).Wait();
             return true;
@@ -59,16 +60,16 @@ namespace UIhub.Service
         public void IncreaseReputationForEstimate(string userId)
         {
             var user = GetUserById(userId);
-            user.Reputation++;
-            user.Points++;
+            user.Reputation+= RatingData.PointsByEstimate;
+            user.Points+= RatingData.PointsByEstimate;
             CheckUserRate(user);
             Update(user).Wait();
         }
         public void IncreaseReputationForLike(string userId)
         {
             var user = GetUserById(userId);
-            user.Reputation+=5;
-            user.Points+=5;
+            user.Reputation+= RatingData.PointsByLike;
+            user.Points+= RatingData.PointsByLike;
             CheckUserRate(user);
             Update(user).Wait();
         }

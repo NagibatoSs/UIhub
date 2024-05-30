@@ -12,20 +12,13 @@
         {
             @if (post.isTop)
             {
-                <tr>
+                <tr onclick="window.location.href='/Post/OpenPostById/@post.Id'; return false">
                     <td>
-                    <a asp-controller="Post" asp-action="OpenPostById" asp-route-id="@post.Id">
-                        @post.Title
-                    </a>
-                    <p>Просмотров:  @post.Views</p>
+                        <h6 style="color:#0d85fe">@post.Title</h6>
+                        <p>@post.Created</p>
                 </td>
-                <td>
-                    @post.Created
-                </td>
-                <td>
+                <td class="align-items-end">
                     @post.AuthorName
-                </td>
-                <td>
                     <p>Оценок:  @post.EstimateCount</p>
                 </td>
             </tr>
@@ -33,26 +26,20 @@
         }
     </tbody>
 </table>
-<h3>Остальные публикации</h3>
+<h4>Остальные публикации</h4>
 <table class="table table-hover" id="postIndexTable">
     <tbody>
         @foreach (var post in Model.Posts)
         {
             @if (!post.isTop)
             {
-                <tr>
+                <tr onclick="window.location.href='/Post/OpenPostById/@post.Id'; return false">
                     <td>
-                        <a asp-controller="Post" asp-action="OpenPostById" asp-route-id="@post.Id">
-                            @post.Title
-                        </a>
-                    </td>
-                    <td>
+                        <p style="color:#0d85fe">@post.Title</p>
                         @post.Created
                     </td>
                     <td>
                         @post.AuthorName
-                    </td>
-                    <td>
                         <p>Оценок:  @post.EstimateCount</p>
                     </td>
                 </tr>

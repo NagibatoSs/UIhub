@@ -28,7 +28,7 @@ namespace UIhub.Controllers
             StringBuilder rateMessage = new StringBuilder();
             foreach (var uploadedFile in uploadedFiles)
             {
-                rateMessage.AppendLine(uploadedFile.FileName + "</br>");
+                rateMessage.AppendLine("<b>"+uploadedFile.FileName + "</b></br>");
                 string fileContents = await GetFileText(uploadedFile);
                 var assessmentNames = GetAssessmentNames();
                 var assessment = GetAssessmentResult(fileContents, assessmentNames);
@@ -51,18 +51,19 @@ namespace UIhub.Controllers
         [HttpPost]
         public async Task<IActionResult> Index(List<IFormFile> UploadedFiles)
         {
+            ViewBag.Message = "<h4>Результаты автоматической оценки</h4></br>";
             double resultRate = 0;
             foreach (var uploadedFile in UploadedFiles)
             {
-                ViewBag.Message+=uploadedFile.FileName + " ";
+                ViewBag.Message+=uploadedFile.FileName + "</br>";
                 string fileContents = await GetFileText(uploadedFile);
                 var assessmentNames = GetAssessmentNames();
                 var assessment = GetAssessmentResult(fileContents, assessmentNames);
-                ViewBag.Message += assessment.Item2;
+                ViewBag.Message += assessment.Item2 + "</br>";
                 resultRate += assessment.Item1;
             }
             resultRate /= UploadedFiles.Count;
-            ViewBag.Message += "Результирующий балл = " + Math.Round(resultRate, 1);
+            ViewBag.Message += "<b>Результирующий балл = " + Math.Round(resultRate, 1)+"</b>";
             return View();
         }
         private List<string> GetAssessmentNames()
@@ -83,8 +84,7 @@ namespace UIhub.Controllers
                     var ctor = type.GetConstructor(new Type[] { });
                     var result = ctor.Invoke(new object[] { });
                     var assessment = (Tuple<double, string>)type.GetMethod("DoAssessment").Invoke(result, new object[] { fileContents });
-                    //assessmentRes.Append(string.Format("{0} </br>", assessment.Item2));
-                    assessmentRes.Append(assessment.Item2 + "<br/>");/* + " Оценка по критерию: " + assessment.Item1);*/
+                    assessmentRes.Append(assessment.Item2 + "<br/>");
                     rate += assessment.Item1;
                     successAssesmentCount++;
                 }

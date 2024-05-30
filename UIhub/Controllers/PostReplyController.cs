@@ -4,6 +4,7 @@ using Microsoft.Extensions.Hosting;
 using UIhub.Data;
 using UIhub.Models;
 using UIhub.Models.ViewModels;
+using UIhub.Rating;
 using UIhub.Service;
 
 namespace UIhub.Controllers
@@ -32,7 +33,7 @@ namespace UIhub.Controllers
             if (!User.Identity.IsAuthenticated)
                 return RedirectToAction("OpenPostById", "Post", new { id = reply.Post.Id });
             var user = _userManager.FindByIdAsync(_userManager.GetUserId(User)).Result;
-            if (user.Reputation < 2)
+            if (user.Reputation < RatingData.RatingForLike)
             {
                 return RedirectToAction("OpenPostById", "Post", new { id = reply.Post.Id });
             }

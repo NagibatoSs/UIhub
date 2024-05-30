@@ -64,7 +64,7 @@
             <h4>@Model.PostViewModel.EstimatesScale[i].Characteristic
             </h4>
             <h6>Среднее: @Model.PostViewModel.EstimatesResult.ScaleAverages[i]</h6>
-            <div>
+            <div style="width:40%; height:50%">
                 <canvas id="myChart @i"/>
                 <script src="~/js/site.js" type="text/javascript"></script>
                 <script>
@@ -85,7 +85,7 @@
             <h4>
                 @Model.PostViewModel.EstimatesVoting[i].Characteristic
             </h4>
-            <div>
+            <div style="width:40%; height:50%">
                 <canvas id="myVoting @i"/>
                 <script src="~/js/site.js" type="text/javascript"></script>
                 <script id="script @i">
@@ -137,12 +137,12 @@ else
                 {
                     <p>@Model.PostViewModel.EstimatesScale[i].Characteristic
                     </p>
-                    <input type="radio" value="1" name="Model.NewScaleEstimateViewModel[@i].SelectedValue" />
-                    <input type="radio" value="2" name="Model.NewScaleEstimateViewModel[@i].SelectedValue" />
-                    <input type="radio" value="3" name="Model.NewScaleEstimateViewModel[@i].SelectedValue" />
-                    <input type="radio" value="4" name="Model.NewScaleEstimateViewModel[@i].SelectedValue" />
-                    <input type="radio" value="5" name="Model.NewScaleEstimateViewModel[@i].SelectedValue" />
-                    <input type="hidden" name="Model.NewScaleEstimateViewModel[@i].Characteristic" value="@Model.PostViewModel.EstimatesScale[i].Characteristic" />
+                    <input type="radio" value="1" name="Model.NewEstimateViewModel[@i].SelectedValue" />
+                    <input type="radio" value="2" name="Model.NewEstimateViewModel[@i].SelectedValue" />
+                    <input type="radio" value="3" name="Model.NewEstimateViewModel[@i].SelectedValue" />
+                    <input type="radio" value="4" name="Model.NewEstimateViewModel[@i].SelectedValue" />
+                    <input type="radio" value="5" name="Model.NewEstimateViewModel[@i].SelectedValue" />
+                    <input type="hidden" name="Model.NewEstimateViewModel[@i].Characteristic" value="@Model.PostViewModel.EstimatesScale[i].Characteristic" />
                     <input type="hidden" name="Model.PostViewModel.EstimatesScale[@i].Id" value="@Model.PostViewModel.EstimatesScale[i].Id" />
                 }
                 <input type="hidden" name="Model.Id" value="@Model.Id" />
@@ -164,9 +164,9 @@ else
                     @for (int j = 0; j < Model.PostViewModel.EstimatesVoting[i].VotingObjects.Count; j++)
                     {
                         <p>@Model.PostViewModel.EstimatesVoting[i].VotingObjects[j].Content</p>
-                        <input type="radio" value="@j" name="Model.NewVotingEstimateViewModel[@i].SelectedValue" />
+                        <input type="radio" value="@j" name="Model.NewEstimateViewModel[@i].SelectedValue" />
                     }
-                    <input type="hidden" name="Model.NewVotingEstimateViewModel[@i].Characteristic" value="@Model.PostViewModel.EstimatesVoting[i].Characteristic" />
+                    <input type="hidden" name="Model.NewEstimateViewModel[@i].Characteristic" value="@Model.PostViewModel.EstimatesVoting[i].Characteristic" />
                     <input type="hidden" name="Model.PostViewModel.EstimatesVoting[@i].Id" value="@Model.PostViewModel.EstimatesVoting[i].Id" />
                 }
                 <input type="hidden" name="Model.Id" value="@Model.Id" />
@@ -190,7 +190,7 @@ else
                         </p>
                         <input type="number" name="Model.PostViewModel.EstimatesRanging[@i].RangingObjects[@j].NumberInSequence" step="1" min="1" max="@Model.PostViewModel.EstimatesRanging[i].RangingObjects.Count"/>
                     }
-                    <input type="hidden" name="Model.NewRangingEstimateViewModel[@i].Characteristic" value="@Model.PostViewModel.EstimatesRanging[i].Characteristic" />
+                    <input type="hidden" name="Model.NewEstimateViewModel[@i].Characteristic" value="@Model.PostViewModel.EstimatesRanging[i].Characteristic" />
                     <input type="hidden" name="Model.PostViewModel.EstimatesRanging[@i].Id" value="@Model.PostViewModel.EstimatesRanging[i].Id" />
                 }
                 <input type="hidden" name="Model.Id" value="@Model.Id" />
