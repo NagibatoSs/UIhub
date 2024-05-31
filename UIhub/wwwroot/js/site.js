@@ -12,7 +12,6 @@ function newFigmaField() {
     field.setAttribute("id", "InterfaceLayoutsSrc[" + nextFieldId + "]");
     field.setAttribute("name", "InterfaceLayoutsSrc");
     field.setAttribute("type", "text");
-    field.setAttribute("style", "margin-bottom: 10px");
     field.setAttribute("placeholder", "Укажите ссылку на Figma-проект");
     field.setAttribute("asp-for", "InterfaceLayoutsSrc[" + nextFieldId + "]");
     div.appendChild(field);
@@ -38,7 +37,7 @@ function newScaleFields() {
     let container = document.getElementById("formatContent");
 
     container.innerHTML = '<div class="col-auto"> <p style="margin-bottom: 10px">Добавить шкалу</p> </div>'
-    container.innerHTML += '<div class="col-auto"> <button style="margin-bottom: 10px" class="btn btn-outline-secondary btn-sm" type="button" id="newScaleBtn" onclick="newScale()">+</button> </div>' 
+    container.innerHTML += '<div class="col-auto"> <button class="btn btn-outline-secondary btn-sm" type="button" id="newScaleBtn" onclick="newScale()">+</button> </div>' 
     let div = document.createElement("div");
     div.setAttribute("class", "form-group");
 
@@ -47,7 +46,6 @@ function newScaleFields() {
     field.setAttribute("id", "EstimatesScale[0]");
     field.setAttribute("name", "EstimatesScale[0].Characteristic");
     field.setAttribute("type", "text");
-    field.setAttribute("style", "margin-bottom: 10px");
     field.setAttribute("placeholder", "Характеристика");
     field.setAttribute("asp-for", "EstimatesScale[0].Characteristic");
     div.appendChild(field);
@@ -69,7 +67,6 @@ function newScale() {
     field.setAttribute("id", "EstimatesScale[" + nextFieldId + "]");
     field.setAttribute("name", "EstimatesScale[" + nextFieldId + "].Characteristic");
     field.setAttribute("type", "text");
-    field.setAttribute("style", "margin-bottom: 10px");
     field.setAttribute("placeholder", "Характеристика");
     field.setAttribute("asp-for", "EstimatesScale["+ nextFieldId +"].Characteristic");
     div.appendChild(field);
@@ -80,7 +77,7 @@ function newScale() {
 function newVotingFields() {
     let container = document.getElementById("formatContent");
     container.innerHTML = '<div class="col-auto"> <p style="margin-bottom: 10px">Добавить голосование</p> </div>'
-    container.innerHTML += '<div class="col-auto"> <button style="margin-bottom: 10px" class="btn btn-outline-secondary btn-sm" type="button" id="newVotingBtn" onclick="newVoting()">+</button> </div>'
+    container.innerHTML += '<div class="col-auto"> <button class="btn btn-outline-secondary btn-sm" type="button" id="newVotingBtn" onclick="newVoting()">+</button> </div>'
 
     let divBlock = document.createElement("div");
     divBlock.setAttribute("id", "block0");
@@ -105,7 +102,6 @@ function newVotingFields() {
     field.setAttribute("type", "button");
     field.setAttribute("class", "btn btn-outline-secondary btn-sm")
     field.innerHTML = "+";
-    field.setAttribute("style", "margin-bottom: 10px");
     field.setAttribute("onclick", "newVoteVariant(0)");
     divCol.appendChild(field);
     divRow.appendChild(divCol);
@@ -128,7 +124,6 @@ function createTextInput(name, placeholder, fieldClass) {
     field.setAttribute("id", name);
     field.setAttribute("name", name);
     field.setAttribute("type", "text");
-    field.setAttribute("style", "margin-bottom: 10px");
     field.setAttribute("placeholder", placeholder);
     field.setAttribute("asp-for", name);
     return field;
@@ -181,7 +176,6 @@ function newVoting() {
     field.setAttribute("type", "button");
     field.setAttribute("class", "btn btn-outline-secondary btn-sm")
     field.innerHTML = "+";
-    field.setAttribute("style", "margin-bottom: 10px");
     field.setAttribute("onclick", "newVoteVariant(" + voteCount + ")");
     divCol.appendChild(field);
     divRow.appendChild(divCol);
@@ -203,7 +197,7 @@ function newVoting() {
 function newRangingFields() {
     let container = document.getElementById("formatContent");
     container.innerHTML = '<div class="col-auto"> <p style="margin-bottom: 10px">Добавить ранжирование</p> </div>'
-    container.innerHTML += '<div class="col-auto"> <button style="margin-bottom: 10px" type="button"  class="btn btn-outline-secondary btn-sm" id="newRangingBtn" onclick="newRanging()">+</button> </div>'
+    container.innerHTML += '<div class="col-auto"> <button type="button"  class="btn btn-outline-secondary btn-sm" id="newRangingBtn" onclick="newRanging()">+</button> </div>'
 
     let divBlock = document.createElement("div");
     divBlock.setAttribute("id", "block0");
@@ -226,7 +220,6 @@ function newRangingFields() {
     divCol = createDiv("col-auto addBtn")
     field = document.createElement("button");
     field.setAttribute("type", "button");
-    field.setAttribute("style", "margin-bottom: 10px");
     field.setAttribute("class", "btn btn-outline-secondary btn-sm")
     field.innerHTML = "+";
     field.setAttribute("onclick", "newRangeObj(0)");
@@ -290,7 +283,6 @@ function newRanging() {
     divCol = createDiv("col-auto addBtn");
     field = document.createElement("button");
     field.setAttribute("type", "button");
-    field.setAttribute("style", "margin-bottom: 10px");
     field.setAttribute("class", "btn btn-outline-secondary btn-sm")
     field.innerHTML = "+";
     field.setAttribute("onclick", "newRangeObj(" + rangeCount + ")");

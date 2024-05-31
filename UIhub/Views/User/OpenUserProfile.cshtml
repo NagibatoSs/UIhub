@@ -1,22 +1,25 @@
 ﻿@model UIhub.Models.ViewModels.UserViewModel
 <h1>Профиль пользователя</h1>
-<h3>@Model.UserName</h3>
-<h5>Email: @Model.Email</h5>
+<h4 style="color:#0d85fe">@Model.UserName</h4>
+<h5 style="color:#0d85fe">Email: @Model.Email</h5>
 <h5><b>@Model.Rank.Name</b></h5>
 <h6>Репутация: @Model.Reputation</h6>
 <h6>Баллы: @Model.Points</h6>
-<h2>Публикации пользователя</h2>
+<hr/>
 @if (Model.Posts.Any())
 {
+    <h2>Публикации пользователя</h2>
     <table class="table table-hover" id="postIndexTable">
         <tbody>
             @foreach (var post in Model.Posts)
             {
-                <tr>
+                <tr onclick="window.location.href='/Post/OpenPostById/@post.Id'; return false">
                     <td>
-                        <a asp-controller="Post" asp-action="OpenPostById" asp-route-id="@post.Id">
-                            @post.Title
-                        </a>
+                        <h5 style="color:#0d85fe">@post.Title</h5>
+                        <p style="font-size:14px">@post.Created @if(post.IsTop){<b style="color:#0d85fe">ТОП</b>}</p>
+                    </td>
+                    <td style="text-align: right">
+                        <p>Оценок:  @post.EstimateCount</p>
                     </td>
                 </tr>
             }
@@ -27,26 +30,21 @@ else
 {
     <p>Вы еще пока не разместили ни одной публикации</p>
 }
-<h2>Текстовые ответы пользователя</h2>
+
 @if (Model.PostReplies.Any())
 {
+    <h2>Текстовые ответы пользователя</h2>
     <table class="table table-hover" id="postIndexTable">
         <tbody>
             @foreach (var rep in Model.PostReplies)
             {
-                <tr>
+                <tr onclick="window.location.href='/Post/OpenPostById/@rep.Post.Id'; return false">
                     <td>
-                        <a asp-controller="Post" asp-action="OpenPostById" asp-route-id="@rep.Post.Id">
-                            @rep.Post.Title
-                        </a>
+                        <h5 style="color:#0d85fe">@rep.Post.Title</h5>
+                        <p style="font-size:14px">@rep.Content</p>
                     </td>
-                </tr>
-                <tr>
-                    <td>
-                        @rep.Content
-                    </td>
-                    <td>
-                        Лайков: @rep.LikesCount
+                    <td style="text-align: right">
+                        <p> Лайков: @rep.LikesCount<p>
                     </td>
                 </tr>
             }

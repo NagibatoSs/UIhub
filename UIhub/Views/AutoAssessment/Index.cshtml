@@ -1,24 +1,23 @@
-﻿<div class="text-center">
-    <h1 class="display-5">Автоматическое оценивание</h1>
-</div>
-@if (User.Identity.IsAuthenticated && User.IsInRole("admin"))
-{
-    <form method="post" asp-action="AddAssessmentFiles" enctype="multipart/form-data">
-            <h3>Добавить файлы для автоматической оценки</h3>
-            <p>Cs-файл</p>
-        <input type="file" name="csFile" required accept=".cs" />
-            <p>Json-файл</p>
-        <input type="file" name="jsonFile" required accept=".json" />
-        <input type="submit" value="Загрузить" />
-    </form>
-}
+﻿<h1>Автоматическое оценивание</h1>
 <div class="text-black">
     <p>Загрузите сюда xaml-файлы вашего интерфейса</p>
 </div>
-<form asp-action="Index" asp-controller="AutoAssessment" method="post" enctype="multipart/form-data">
-    <input type="file" name="uploadedFiles" title=" " required multiple accept=".xaml" /><br>
-    <input type="submit" value="Загрузить" />
+<form class="form-group" asp-action="Index" asp-controller="AutoAssessment" method="post" enctype="multipart/form-data">
+    <input class="form-control" type="file" name="uploadedFiles" title=" " required multiple accept=".xaml" /><br>
+    <input type="submit" class="btn btn-primary" value="Запустить оценивание" />
 </form>
 <div>
     @Html.Raw(@ViewBag.Message)
 </div>
+<hr/>
+@if (User.Identity.IsAuthenticated && User.IsInRole("admin"))
+{
+    <form class="form-group" method="post" asp-action="AddAssessmentFiles" enctype="multipart/form-data">
+        <h5>Добавить файлы для автоматической оценки</h5>
+        <p>Cs-файл</p>
+        <input class="form-control" type="file" name="csFile" required accept=".cs" />
+        <p>Json-файл</p>
+        <input class="form-control" type="file" name="jsonFile" required accept=".json" />
+        <input class="btn btn-outline-primary" type="submit" value="Загрузить" />
+    </form>
+}
