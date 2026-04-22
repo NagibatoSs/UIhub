@@ -1,0 +1,133 @@
+﻿@model AnalyzeResultViewModel
+@using UIhub.Models.ViewModels
+
+<h2>Результат анализа</h2>
+<a asp-action="Index" class="btn btn-secondary mb-3">← Назад</a>
+
+@foreach (var item in Model.Items)
+{
+    var analysisResults = ViewBag.AnalysisResults as List<dynamic>;
+    var currentAnalysis = analysisResults?.FirstOrDefault(a => a.FileName == item.FileName);
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <strong>@item.FileName</strong>
+            <span class="text-muted ms-2">@item.Image.Width × @item.Image.Height px</span>
+        </div>
+        <div class="card-body">
+            @{
+                var displayWidth = item.Image.Width / 2;   // int
+                var displayHeight = item.Image.Height / 2; // int
+                var scale = (double)displayWidth / item.Image.Width;
+            }
+
+            <div style="position: relative; display: inline-block; width:@(displayWidth)px; height:@(displayHeight)px;">
+                <img src="~/uploads/@item.FileName"
+                     width="@displayWidth"
+                     height="@displayHeight"
+                     style="display:block;" />
+
+                @if (currentAnalysis != null)
+                {
+                    foreach (var analyzerResult in currentAnalysis.Results)
+                    {
+                        foreach (var res in analyzerResult.Items)
+                        {
+                            foreach (var id in res.ElementIds)
+                            {
+                                var el = item.Elements.FirstOrDefault(e => e.Id == id);
+                                if (el != null)
+                                {
+                                    var left = (int)(el.Bbox.X * scale);
+                                    var top = (int)(el.Bbox.Y * scale);
+                                    var width = (int)(el.Bbox.Width * scale);
+                                    var height = (int)(el.Bbox.Height * scale);
+
+                                    <div style="
+                        position: absolute;
+                        left:@(left)px;
+                        top:@(top)px;
+                        width:@(width)px;
+                        height:@(height)px;
+                        border: 2px solid red;
+                        box-sizing: border-box;
+                        pointer-events: none;">
+                                    </div>
+                                }
+                            }
+                        }
+                    }
+                }
+            </div>
+            <table class="table table-striped table-sm">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Класс</th>
+                        <th>Уверенность</th>
+                        <th>Позиция (x, y)</th>
+                        <th>Размер (w × h)</th>
+                        <th>Центр</th>
+                        <th>Площадь</th>
+                        <th>Соотношение сторон</th>
+                        <th>Цвет (RGB)</th>
+                        <th>Яркость</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var el in item.Elements)
+                    {
+                        var r = (int)el.Visual.MeanColorRgb[0];
+                        var g = (int)el.Visual.MeanColorRgb[1];
+                        var b = (int)el.Visual.MeanColorRgb[2];
+                        <tr>
+                            <td>@el.Id</td>
+                            <td>@el.Class</td>
+                            <td>@($"{el.Confidence:P1}")</td>
+                            <td>@el.Bbox.X, @el.Bbox.Y</td>
+                            <td>@el.Bbox.Width × @el.Bbox.Height</td>
+                            <td>@($"{el.Geometry.CenterX:F1}"), @($"{el.Geometry.CenterY:F1}")</td>
+                            <td>@el.Geometry.Area px²</td>
+                            <td>@($"{el.Geometry.AspectRatio:F2}")</td>
+                            <td>
+                                <span style="display:inline-block; width:16px; height:16px; background:rgb(@r,@g,@b); border:1px solid #ccc; vertical-align:middle;"></span>
+                                @r, @g, @b
+                            </td>
+                            <td>@($"{el.Visual.MeanBrightness:F1}")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            @if (ViewBag.AnalysisResults != null)
+            {
+                if (currentAnalysis != null)
+                {
+                    <div class="mt-3">
+                        <h5>Результаты анализа</h5>
+
+                        @foreach (var analyzerResult in currentAnalysis.Results)
+                        {
+                            <div class="mb-2">
+                                <strong>@analyzerResult.AnalyzerName</strong>
+
+                                @if (analyzerResult.Items.Count == 0)
+                                {
+                                    <div class="text-success">Нарушений не найдено</div>
+                                }
+                                else
+                                {
+                                    <ul>
+                                        @foreach (var res in analyzerResult.Items)
+                                        {
+                                            <li>@res.Message</li>
+                                        }
+                                    </ul>
+                                }
+                            </div>
+                        }
+                    </div>
+                }
+            }
+        </div>
+    </div>
+}

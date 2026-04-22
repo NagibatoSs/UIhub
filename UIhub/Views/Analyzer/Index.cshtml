@@ -1,0 +1,16 @@
+﻿<h2>Анализ интерфейса</h2>
+
+@if (!ViewData.ModelState.IsValid)
+{
+    <div class="alert alert-danger">
+        @Html.ValidationSummary()
+    </div>
+}
+
+<form asp-action="Analyze" method="post" enctype="multipart/form-data">
+    <div class="mb-3">
+        <label>Выберите изображения интерфейса</label>
+        <input type="file" name="Files" multiple accept="image/png,image/jpeg,image/jpg" class="form-control" />
+    </div>
+    <button type="submit" class="btn btn-primary">Анализировать</button>
+</form>

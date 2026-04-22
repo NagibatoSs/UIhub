@@ -29,10 +29,30 @@ builder.Services.AddScoped<IUser, UserService>();
 builder.Services.AddScoped<IUserRank, UserRankService>();
 builder.Services.AddScoped<IEstimate, EstimateService>();
 
+builder.Services.AddHttpClient("PythonApi", client =>
+{
+    client.BaseAddress = new Uri("http://127.0.0.1:8000");
+    client.Timeout = TimeSpan.FromSeconds(60);
+});
+
 builder.Services.AddRazorPages();
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
+
+// Добавьте это сразу после builder.Build()
+app.Use(async (context, next) =>
+{
+    try
+    {
+        await next();
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"ОШИБКА: {ex}");
+        throw;
+    }
+});
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -42,11 +62,12 @@ if (app.Environment.IsDevelopment())
 else
 {
     app.UseExceptionHandler("/Home/Error");
+    app.UseHttpsRedirection();
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
