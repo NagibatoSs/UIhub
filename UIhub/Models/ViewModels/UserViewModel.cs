@@ -10,5 +10,6 @@
         public UserRank Rank { get; set; }
         public List<Post> Posts { get; set; }
         public List<PostReply> PostReplies { get; set; }
+        public List<Analysis> Analyses { get; set; }
     }
 }

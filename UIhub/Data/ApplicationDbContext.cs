@@ -22,6 +22,11 @@ namespace UIhub.Data
         public DbSet<RangingObject> RangingObjects { get; set; }
         public DbSet<UserPostEstimate> UserPostEstimates {  get; set; }
         public DbSet<PostReplyLike> PostReplyLikes { get; set; }
+        public DbSet<Analysis> Analysis { get; set; }
+        public DbSet<AnalysisFile> AnalysisFiles { get; set; }
+        public DbSet<AnalysisCriteria> AnalysisCriterias { get; set; }
+        public DbSet<CriteriaResult> CriteriaResults { get; set; }
+        public DbSet<CriteriaIssue> CriteriaIssues { get; set; }
 
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)

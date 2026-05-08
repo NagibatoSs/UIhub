@@ -55,3 +55,24 @@ else
 {
     <p>Вы еще пока не написали ни одного текстового ответа</p>
 }
+@if (Model.Analyses.Any())
+{
+    <h2>История анализов</h2>
+    <table class="table table-hover">
+        <tbody>
+            @foreach (var analysis in Model.Analyses)
+            {
+                <tr onclick="window.location.href='/User/OpenAnalysis/@analysis.Id'" style="cursor:pointer">
+                    <td>
+                        <h5 style="color:#0d85fe">Анализ от @analysis.CreatedAt.ToString("dd.MM.yyyy HH:mm")</h5>
+                        <p style="font-size:14px">@string.Join(", ", analysis.Files.Select(f => f.FileName))</p>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>История анализов пуста</p>
+}

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using UIhub.Data;
 
@@ -11,9 +12,11 @@ using UIhub.Data;
 namespace UIhub.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260507103035_Analysis")]
+    partial class Analysis
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -174,7 +177,7 @@ namespace UIhub.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Analysis");
+                    b.ToTable("Analyses");
                 });
 
             modelBuilder.Entity("UIhub.Models.AnalysisCriteria", b =>
@@ -198,6 +201,10 @@ namespace UIhub.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("StandardReference")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ThresholdDescription")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -297,14 +304,14 @@ namespace UIhub.Migrations
                     b.Property<int>("AnalysisFileId")
                         .HasColumnType("int");
 
+                    b.Property<int>("CriteriaId")
+                        .HasColumnType("int");
+
                     b.Property<bool>("IsOk")
                         .HasColumnType("bit");
 
                     b.Property<string>("MetricValue")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ResultImagePath")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");

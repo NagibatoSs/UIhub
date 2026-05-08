@@ -1,39 +1,125 @@
 ﻿@model AnalyzeResultViewModel
 @using UIhub.Models.ViewModels
+@using UIhub.Analyze
 
-<h2>Результат анализа</h2>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+
+<h2>Система выдачи рекомендаций</h2>
 <a asp-action="Index" class="btn btn-secondary mb-3">← Назад</a>
 
 @foreach (var item in Model.Items)
 {
-    var analysisResults = ViewBag.AnalysisResults as List<dynamic>;
-    var currentAnalysis = analysisResults?.FirstOrDefault(a => a.FileName == item.FileName);
+    var currentAnalysis = Model.AnalysisResults
+        .FirstOrDefault(a => a.FileName == item.FileName);
 
-    <div class="card mb-4">
-        <div class="card-header">
-            <strong>@item.FileName</strong>
-            <span class="text-muted ms-2">@item.Image.Width × @item.Image.Height px</span>
-        </div>
-        <div class="card-body">
-            @{
-                var displayWidth = item.Image.Width / 2;   // int
-                var displayHeight = item.Image.Height / 2; // int
-                var scale = (double)displayWidth / item.Image.Width;
-            }
+    var displayWidth = Math.Min(item.Image.Width / 2, 360);
+    var scale = (double)displayWidth / item.Image.Width;
+    var displayHeight = (int)(item.Image.Height * scale);
 
-            <div style="position: relative; display: inline-block; width:@(displayWidth)px; height:@(displayHeight)px;">
+    <div class="mb-5">
+        <h5>@item.FileName</h5>
+
+        @* Результаты анализа *@
+        <div class="d-flex align-items-start gap-4 mb-4">
+            <div style="position: relative; width:@(displayWidth)px; height:@(displayHeight)px; cursor:pointer;"
+                 data-src="/uploads/@item.FileName"
+                 data-boxes="[]"
+                 data-orig-width="@item.Image.Width"
+                 data-orig-height="@item.Image.Height"
+                 onclick="openLightbox(this)">
                 <img src="~/uploads/@item.FileName"
                      width="@displayWidth"
                      height="@displayHeight"
-                     style="display:block;" />
+                     style="display:block; border:1px solid #ddd;" />
+                <div style="position:absolute;bottom:4px;right:4px;background:rgba(0,0,0,0.4);color:white;font-size:11px;padding:2px 6px;border-radius:3px;">
+                    🔍 увеличить
+                </div>
+            </div>
 
+            <div>
+                <h6><strong>Результаты анализа</strong></h6>
                 @if (currentAnalysis != null)
                 {
-                    foreach (var analyzerResult in currentAnalysis.Results)
-                    {
-                        foreach (var res in analyzerResult.Items)
+                    <ul class="mb-0" style="list-style:none; padding:0;">
+                        @foreach (var analyzerResult in currentAnalysis.Results)
                         {
-                            foreach (var id in res.ElementIds)
+                            if (analyzerResult.Metric != null)
+                            {
+                                var statusColor = analyzerResult.Metric.IsOk ? "text-success" : "text-danger";
+                                <li class="@statusColor mb-1">
+                                    @if (analyzerResult.Metric.IsOk)
+                                    {
+                                        <i class="bi bi-check-circle-fill"></i>
+                                    }
+                                    else
+                                    {
+                                        <i class="bi bi-exclamation-triangle-fill"></i>
+                                    }
+                                    @analyzerResult.Metric.Name:
+                                    <strong>@analyzerResult.Metric.Value</strong>
+                                    @if (!string.IsNullOrEmpty(analyzerResult.Metric.Threshold))
+                                    {
+                                        <span class="text-muted">(@analyzerResult.Metric.Threshold)</span>
+                                    }
+                                    @if (analyzerResult.Metric.IsOk)
+                                    {
+                                        <span class="badge bg-success ms-1">Норма</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-danger ms-1">Нарушение</span>
+                                    }
+                                </li>
+                            }
+                        }
+                    </ul>
+                }
+                else
+                {
+                    <div class="text-muted">Результаты не рассчитаны</div>
+                }
+            </div>
+        </div>
+
+        @* Выявленные проблемы *@
+        @if (currentAnalysis != null)
+        {
+            var hasProblems = currentAnalysis.Results.Any(r => r.Items.Count > 0);
+
+            @if (hasProblems)
+            {
+                <h5 class="mb-3">Выявленные проблемы</h5>
+
+                @foreach (var analyzerResult in currentAnalysis.Results)
+                {
+                    if (analyzerResult.Items.Count == 0) continue;
+
+                    var problemElementIds = analyzerResult.Items
+                    .SelectMany(x => x.ElementIds)
+                    .Distinct()
+                    .ToList();
+
+                    var boxesJson = System.Text.Json.JsonSerializer.Serialize(
+                    problemElementIds
+                    .Select(id => item.Elements.FirstOrDefault(e => e.Id == id))
+                    .Where(el => el != null)
+                    .Select(el => new { x = el.Bbox.X, y = el.Bbox.Y, w = el.Bbox.Width, h = el.Bbox.Height })
+                    .ToList()
+                    );
+
+                    <div class="d-flex align-items-start gap-4 mb-4">
+                        <div style="position: relative; width:@(displayWidth)px; height:@(displayHeight)px; cursor:pointer; flex-shrink:0;"
+                             data-src="/uploads/@item.FileName"
+                             data-boxes="@Html.Raw(System.Web.HttpUtility.HtmlEncode(boxesJson))"
+                             data-orig-width="@item.Image.Width"
+                             data-orig-height="@item.Image.Height"
+                             onclick="openLightbox(this)">
+                            <img src="~/uploads/@item.FileName"
+                                 width="@displayWidth"
+                                 height="@displayHeight"
+                                 style="display:block; border:1px solid #333;" />
+
+                            @foreach (var id in problemElementIds)
                             {
                                 var el = item.Elements.FirstOrDefault(e => e.Id == id);
                                 if (el != null)
@@ -44,90 +130,81 @@
                                     var height = (int)(el.Bbox.Height * scale);
 
                                     <div style="
-                        position: absolute;
-                        left:@(left)px;
-                        top:@(top)px;
-                        width:@(width)px;
-                        height:@(height)px;
-                        border: 2px solid red;
-                        box-sizing: border-box;
-                        pointer-events: none;">
+                                        position:absolute;
+                                        left:@(left)px;
+                                        top:@(top)px;
+                                        width:@(width)px;
+                                        height:@(height)px;
+                                        border:2px solid red;
+                                        box-sizing:border-box;
+                                        pointer-events:none;">
                                     </div>
                                 }
                             }
-                        }
-                    }
-                }
-            </div>
-            <table class="table table-striped table-sm">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Класс</th>
-                        <th>Уверенность</th>
-                        <th>Позиция (x, y)</th>
-                        <th>Размер (w × h)</th>
-                        <th>Центр</th>
-                        <th>Площадь</th>
-                        <th>Соотношение сторон</th>
-                        <th>Цвет (RGB)</th>
-                        <th>Яркость</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var el in item.Elements)
-                    {
-                        var r = (int)el.Visual.MeanColorRgb[0];
-                        var g = (int)el.Visual.MeanColorRgb[1];
-                        var b = (int)el.Visual.MeanColorRgb[2];
-                        <tr>
-                            <td>@el.Id</td>
-                            <td>@el.Class</td>
-                            <td>@($"{el.Confidence:P1}")</td>
-                            <td>@el.Bbox.X, @el.Bbox.Y</td>
-                            <td>@el.Bbox.Width × @el.Bbox.Height</td>
-                            <td>@($"{el.Geometry.CenterX:F1}"), @($"{el.Geometry.CenterY:F1}")</td>
-                            <td>@el.Geometry.Area px²</td>
-                            <td>@($"{el.Geometry.AspectRatio:F2}")</td>
-                            <td>
-                                <span style="display:inline-block; width:16px; height:16px; background:rgb(@r,@g,@b); border:1px solid #ccc; vertical-align:middle;"></span>
-                                @r, @g, @b
-                            </td>
-                            <td>@($"{el.Visual.MeanBrightness:F1}")</td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-            @if (ViewBag.AnalysisResults != null)
-            {
-                if (currentAnalysis != null)
-                {
-                    <div class="mt-3">
-                        <h5>Результаты анализа</h5>
 
-                        @foreach (var analyzerResult in currentAnalysis.Results)
-                        {
-                            <div class="mb-2">
-                                <strong>@analyzerResult.AnalyzerName</strong>
-
-                                @if (analyzerResult.Items.Count == 0)
-                                {
-                                    <div class="text-success">Нарушений не найдено</div>
-                                }
-                                else
-                                {
-                                    <ul>
-                                        @foreach (var res in analyzerResult.Items)
-                                        {
-                                            <li>@res.Message</li>
-                                        }
-                                    </ul>
-                                }
+                            <div style="position:absolute;bottom:4px;right:4px;background:rgba(0,0,0,0.4);color:white;font-size:11px;padding:2px 6px;border-radius:3px;">
+                                🔍 увеличить
                             </div>
-                        }
+                        </div>
+
+                        <div style="max-width: 620px;">
+                            <h5>@analyzerResult.AnalyzerName</h5>
+
+                            @* Список нарушений — серый *@
+                            @if (analyzerResult.AnalyzerName == "Неправильное выравнивание элементов группы")
+                            {
+                                @foreach (var group in analyzerResult.Items.GroupBy(x => x.GroupLabel))
+                                {
+                                    <div class="mb-3">
+                                        <strong class="text-muted">Группа: @group.Key</strong>
+                                        <ul class="text-muted">
+                                            @foreach (var res in group)
+                                            {
+                                                <li>@res.Message</li>
+                                            }
+                                        </ul>
+                                    </div>
+                                }
+                            }
+                            else
+                            {
+                                <ul class="text-muted">
+                                    @foreach (var res in analyzerResult.Items)
+                                    {
+                                        <li>@res.Message</li>
+                                    }
+                                </ul>
+                            }
+
+                            @* Рекомендация — заметнее *@
+                            <h6><strong>Рекомендация</strong></h6>
+                            <p class="mb-1">@analyzerResult.Recomendation</p>
+
+                            @* Стандарты *@
+                            @if (!string.IsNullOrEmpty(analyzerResult.StandardReference))
+                            {
+                                <p class="text-muted mb-0" style="font-size:13px">
+                                    <em>Стандарты: @analyzerResult.StandardReference</em>
+                                </p>
+                            }
+                        </div>
                     </div>
                 }
             }
-        </div>
+            else
+            {
+                <div class="text-success mt-2">
+                    <i class="bi bi-check-circle-fill"></i> Нарушений не выявлено
+                </div>
+            }
+        }
     </div>
 }
+
+@* Lightbox *@
+<div id="lightbox"
+     style="display:none; position:fixed; top:0; left:0; width:100%; height:100%;
+            background:rgba(0,0,0,0.85); z-index:9999; justify-content:center; align-items:center; cursor:pointer;"
+     onclick="closeLightbox()">
+    <canvas id="lightbox-canvas" style="display:block; max-width:none; max-height:none;"></canvas>
+</div>

@@ -1,4 +1,51 @@
-﻿
+﻿function openLightbox(el) {
+    const src = el.getAttribute('data-src');
+    const boxes = JSON.parse(el.getAttribute('data-boxes'));
+    const origWidth = parseInt(el.getAttribute('data-orig-width'));
+    const origHeight = parseInt(el.getAttribute('data-orig-height'));
+    const lightbox = document.getElementById('lightbox');
+    const canvas = document.getElementById('lightbox-canvas');
+    const ctx = canvas.getContext('2d');
+    const img = new Image();
+
+    img.onerror = function () {
+        console.log('Ошибка загрузки:', src);
+    };
+
+    img.onload = function () {
+        const maxW = window.innerWidth * 0.95;
+        const maxH = window.innerHeight * 0.95;
+
+        // Сохраняем пропорции
+        const scaleW = maxW / img.naturalWidth;
+        const scaleH = maxH / img.naturalHeight;
+        const scale = Math.min(scaleW, scaleH);
+
+        canvas.width = img.naturalWidth * scale;
+        canvas.height = img.naturalHeight * scale;
+
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+        ctx.strokeStyle = 'red';
+        ctx.lineWidth = 3;
+
+        boxes.forEach(function (box) {
+            ctx.strokeRect(
+                box.x * scale,
+                box.y * scale,
+                box.w * scale,
+                box.h * scale
+            );
+        });
+    };
+
+    img.src = src;
+    lightbox.style.display = 'flex';
+}
+
+function closeLightbox() {
+    document.getElementById('lightbox').style.display = 'none';
+}
 function newFigmaField() {
     let container = document.getElementById("layoutsFields");
     let fieldCount = container.getElementsByTagName("input").length;

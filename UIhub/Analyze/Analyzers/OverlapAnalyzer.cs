@@ -1,17 +1,39 @@
-﻿using Microsoft.CodeAnalysis.Diagnostics;
+﻿using UIhub.Data;
 
 namespace UIhub.Analyze.Analyzers
 {
     public class OverlapAnalyzer : UIAnalyzer
     {
-        public override string Name => "OverlapAnalyzer";
+        public override string Code => "OVERLAP";
+
+        public OverlapAnalyzer(IAnalysisCriteria criteriaService) : base(criteriaService) { }
 
         public override AnalysisResult Analyze(List<UiElement> elements)
         {
+            var criteria = _criteriaService.GetByCode(Code);
+            var recommendation = criteria?.Recommendation ?? "";
+            var name = criteria?.Name ?? Code;
+            var standardReference = criteria?.StandardReference ?? "";
+
             var result = new AnalysisResult
             {
-                AnalyzerName = Name
+                AnalyzerName = name,
+                Code = Code,
+                Recomendation = recommendation,
+                StandardReference = standardReference
             };
+
+            result.Items = FindIssues(elements);
+
+            result.Metric = BuildMetric(name,result);
+
+            return result;
+        }
+
+
+        private List<AnalysisItem> FindIssues(List<UiElement> elements)
+        {
+            var issues = new List<AnalysisItem>();
 
             for (int i = 0; i < elements.Count; i++)
             {
@@ -22,16 +44,16 @@ namespace UIhub.Analyze.Analyzers
 
                     if (AreOverlapping(first.Bbox, second.Bbox))
                     {
-                        result.Items.Add(new AnalysisItem
+                        issues.Add(new AnalysisItem
                         {
                             ElementIds = new List<int> { first.Id, second.Id },
-                            Message = $"Элементы {first.Id} ({first.Class}) и {second.Id} ({second.Class}) пересекаются."
+                            Message = $"Элементы {ElementClassNames.Translate(first.Class)} и {ElementClassNames.Translate(second.Class)} пересекаются."
                         });
                     }
                 }
             }
 
-            return result;
+            return issues;
         }
 
         private bool AreOverlapping(BBox a, BBox b)
@@ -48,6 +70,17 @@ namespace UIhub.Analyze.Analyzers
                 bBottom <= a.Y;
 
             return !noOverlap;
+        }
+
+        private AnalysisMetric BuildMetric(string name, AnalysisResult result)
+        {
+            return new AnalysisMetric
+            {
+                Name = name,
+                Value = result.Items.Any() ? $"{result.Items.Count}" : "пересечений нет",
+                Threshold = "",
+                IsOk = !result.Items.Any()
+            };
         }
     }
 }
