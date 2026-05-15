@@ -28,20 +28,21 @@ namespace UIhub.Analyze.Analyzers
                 AnalyzerName = name,
                 Code = Code,
                 Recomendation = recommendation,
-                StandardReference = standardReference
+                StandardReference = standardReference,
+                Description = criteria?.Description ?? ""
             };
 
             var clickable = GetClickableElements(elements);
 
             if (clickable.Count < 2)
             {
-                result.Metric = BuildMetric(true, "нет данных", minSpacing);
+                result.Metric = BuildMetric(name,true, "нет данных", minSpacing);
                 return result;
             }
 
             var minDistance = FindMinDistance(clickable, minSpacing, result);
 
-            result.Metric = BuildMetric(
+            result.Metric = BuildMetric(name,
                 minDistance == double.MaxValue || minDistance >= minSpacing,
                 minDistance == double.MaxValue ? "нет данных" : $"{minDistance:F1}px",
                 minSpacing
@@ -95,11 +96,11 @@ namespace UIhub.Analyze.Analyzers
             return Math.Sqrt(dx * dx + dy * dy);
         }
 
-        private AnalysisMetric BuildMetric(bool isOk, string value, int minSpacing)
+        private AnalysisMetric BuildMetric(string name, bool isOk, string value, int minSpacing)
         {
             return new AnalysisMetric
             {
-                Name = "Минимальное расстояние между элементами",
+                Name = name,
                 Value = value,
                 Threshold = $"≥ {minSpacing}px",
                 IsOk = isOk

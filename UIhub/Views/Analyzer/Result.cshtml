@@ -1,6 +1,7 @@
 ﻿@model AnalyzeResultViewModel
 @using UIhub.Models.ViewModels
 @using UIhub.Analyze
+@using System.Globalization
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
 
@@ -12,32 +13,38 @@
     var currentAnalysis = Model.AnalysisResults
         .FirstOrDefault(a => a.FileName == item.FileName);
 
-    var displayWidth = Math.Min(item.Image.Width / 2, 360);
-    var scale = (double)displayWidth / item.Image.Width;
-    var displayHeight = (int)(item.Image.Height * scale);
+    var aspectRatio = (double)item.Image.Height / item.Image.Width * 100;
 
     <div class="mb-5">
-        <h5>@item.FileName</h5>
+        <h4><strong>@item.FileName</strong></h4>
 
         @* Результаты анализа *@
         <div class="d-flex align-items-start gap-4 mb-4">
-            <div style="position: relative; width:@(displayWidth)px; height:@(displayHeight)px; cursor:pointer;"
+
+            @* Изображение *@
+            @{
+                var isVertical = item.Image.Height > item.Image.Width;
+                var containerClass = isVertical ? "analysis-image-container vertical" : "analysis-image-container";
+            }
+
+            <div class="@containerClass" style="cursor:pointer;"
                  data-src="/uploads/@item.FileName"
                  data-boxes="[]"
                  data-orig-width="@item.Image.Width"
                  data-orig-height="@item.Image.Height"
                  onclick="openLightbox(this)">
-                <img src="~/uploads/@item.FileName"
-                     width="@displayWidth"
-                     height="@displayHeight"
-                     style="display:block; border:1px solid #ddd;" />
-                <div style="position:absolute;bottom:4px;right:4px;background:rgba(0,0,0,0.4);color:white;font-size:11px;padding:2px 6px;border-radius:3px;">
-                    🔍 увеличить
+                <div style="position:relative; padding-top:@(aspectRatio.ToString("F2", CultureInfo.InvariantCulture))%;">
+                    <img src="~/uploads/@item.FileName"
+                         style="position:absolute; top:0; left:0; width:100%; height:100%; border:1px solid #ddd;" />
+                    <div style="position:absolute;bottom:4px;right:4px;background:rgba(0,0,0,0.4);color:white;font-size:11px;padding:2px 6px;border-radius:3px;">
+                        🔍 увеличить
+                    </div>
                 </div>
             </div>
 
+            @* Результаты *@
             <div>
-                <h6><strong>Результаты анализа</strong></h6>
+                <h5><strong>Результаты анализа</strong></h5>
                 @if (currentAnalysis != null)
                 {
                     <ul class="mb-0" style="list-style:none; padding:0;">
@@ -61,14 +68,6 @@
                                     {
                                         <span class="text-muted">(@analyzerResult.Metric.Threshold)</span>
                                     }
-                                    @if (analyzerResult.Metric.IsOk)
-                                    {
-                                        <span class="badge bg-success ms-1">Норма</span>
-                                    }
-                                    else
-                                    {
-                                        <span class="badge bg-danger ms-1">Нарушение</span>
-                                    }
                                 </li>
                             }
                         }
@@ -88,7 +87,7 @@
 
             @if (hasProblems)
             {
-                <h5 class="mb-3">Выявленные проблемы</h5>
+                <h4 class="mb-3">Выявленные проблемы</h4>
 
                 @foreach (var analyzerResult in currentAnalysis.Results)
                 {
@@ -108,49 +107,49 @@
                     );
 
                     <div class="d-flex align-items-start gap-4 mb-4">
-                        <div style="position: relative; width:@(displayWidth)px; height:@(displayHeight)px; cursor:pointer; flex-shrink:0;"
+                        <div class="@containerClass" style="cursor:pointer;"
                              data-src="/uploads/@item.FileName"
-                             data-boxes="@Html.Raw(System.Web.HttpUtility.HtmlEncode(boxesJson))"
+                             data-boxes="@Html.Raw(System.Web.HttpUtility.HtmlEncode(boxesJson))" ← исправьте
                              data-orig-width="@item.Image.Width"
                              data-orig-height="@item.Image.Height"
                              onclick="openLightbox(this)">
-                            <img src="~/uploads/@item.FileName"
-                                 width="@displayWidth"
-                                 height="@displayHeight"
-                                 style="display:block; border:1px solid #333;" />
+                            <div style="position:relative; padding-top:@(aspectRatio.ToString("F2", CultureInfo.InvariantCulture))%;">
+                                <img src="~/uploads/@item.FileName"
+                                     style="position:absolute; top:0; left:0; width:100%; height:100%; border:1px solid #333;" />
 
-                            @foreach (var id in problemElementIds)
-                            {
-                                var el = item.Elements.FirstOrDefault(e => e.Id == id);
-                                if (el != null)
+                                @foreach (var id in problemElementIds)
                                 {
-                                    var left = (int)(el.Bbox.X * scale);
-                                    var top = (int)(el.Bbox.Y * scale);
-                                    var width = (int)(el.Bbox.Width * scale);
-                                    var height = (int)(el.Bbox.Height * scale);
+                                    var el = item.Elements.FirstOrDefault(e => e.Id == id);
+                                    if (el != null)
+                                    {
+                                        var leftPct = (double)el.Bbox.X / item.Image.Width * 100;
+                                        var topPct = (double)el.Bbox.Y / item.Image.Height * 100;
+                                        var widthPct = (double)el.Bbox.Width / item.Image.Width * 100;
+                                        var heightPct = (double)el.Bbox.Height / item.Image.Height * 100;
 
-                                    <div style="
-                                        position:absolute;
-                                        left:@(left)px;
-                                        top:@(top)px;
-                                        width:@(width)px;
-                                        height:@(height)px;
-                                        border:2px solid red;
-                                        box-sizing:border-box;
-                                        pointer-events:none;">
-                                    </div>
+                                        <div style="
+                                            position:absolute;
+                                            left:@(leftPct.ToString("F2", CultureInfo.InvariantCulture))%;
+                                            top:@(topPct.ToString("F2", CultureInfo.InvariantCulture))%;
+                                            width:@(widthPct.ToString("F2", CultureInfo.InvariantCulture))%;
+                                            height:@(heightPct.ToString("F2", CultureInfo.InvariantCulture))%;
+                                            border:2px solid red;
+                                            box-sizing:border-box;
+                                            pointer-events:none;">
+                                        </div>
+                                    }
                                 }
-                            }
 
-                            <div style="position:absolute;bottom:4px;right:4px;background:rgba(0,0,0,0.4);color:white;font-size:11px;padding:2px 6px;border-radius:3px;">
-                                🔍 увеличить
+                                <div style="position:absolute;bottom:4px;right:4px;background:rgba(0,0,0,0.4);color:white;font-size:11px;padding:2px 6px;border-radius:3px;">
+                                    🔍 увеличить
+                                </div>
                             </div>
                         </div>
 
-                        <div style="max-width: 620px;">
+                        @* Текст нарушений *@
+                        <div style="max-width:50%;">
                             <h5>@analyzerResult.AnalyzerName</h5>
 
-                            @* Список нарушений — серый *@
                             @if (analyzerResult.AnalyzerName == "Неправильное выравнивание элементов группы")
                             {
                                 @foreach (var group in analyzerResult.Items.GroupBy(x => x.GroupLabel))
@@ -168,22 +167,24 @@
                             }
                             else
                             {
-                                <ul class="text-muted">
+                                <ul class="text-muted mb-1" style="padding-left:1.2rem;">
                                     @foreach (var res in analyzerResult.Items)
                                     {
                                         <li>@res.Message</li>
                                     }
                                 </ul>
                             }
+                            @if (!string.IsNullOrEmpty(analyzerResult.Description))
+                            {
+                                <p class="text-muted mb-2">@analyzerResult.Description</p>
+                            }
 
-                            @* Рекомендация — заметнее *@
                             <h6><strong>Рекомендация</strong></h6>
                             <p class="mb-1">@analyzerResult.Recomendation</p>
 
-                            @* Стандарты *@
                             @if (!string.IsNullOrEmpty(analyzerResult.StandardReference))
                             {
-                                <p class="text-muted mb-0" style="font-size:13px">
+                                <p class="text-muted mb-3" style="font-size:13px">
                                     <em>Стандарты: @analyzerResult.StandardReference</em>
                                 </p>
                             }

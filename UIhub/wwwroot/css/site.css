@@ -1,7 +1,14 @@
 ﻿html {
   font-size: 14px;
 }
-
+.analysis-image-container {
+    position: relative;
+    width: 45%;
+    flex-shrink: 0;
+}
+.analysis-image-container.vertical {
+        width: 25%;
+    }
 #lightbox-canvas {
     max-width: none !important;
     max-height: none !important;

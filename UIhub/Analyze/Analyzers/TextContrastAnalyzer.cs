@@ -27,13 +27,14 @@ namespace UIhub.Analyze.Analyzers
                 Code = Code,
                 Recomendation = recommendation,
                 StandardReference = standardReference,
+                Description = criteria?.Description ?? ""
             };
 
             var textElements = GetTextElements(elements);
 
             if (!textElements.Any())
             {
-                result.Metric = BuildMetric(name, true, "нет данных", threshold);
+                result.Metric = BuildMetric(name, true, "нарушений нет", threshold);
                 return result;
             }
 

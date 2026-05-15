@@ -38,6 +38,7 @@ namespace UIhub.Analyze.Analyzers
                 Code = Code,
                 Recomendation = recommendation,
                 StandardReference = standardReference,
+                Description = criteria?.Description ?? ""
             };
 
             if (elements == null || elements.Count < 2)
@@ -147,9 +148,9 @@ namespace UIhub.Analyze.Analyzers
         private void CheckAlignment(List<UiElement> group, AnalysisResult result, int axisTolerance)
         {
             if (IsHorizontalGroup(group))
-                CheckAxis(group, result, e => e.Geometry.CenterY, "горизонтали", axisTolerance);
+                CheckAxis(group, result, "горизонтали", axisTolerance);
             else
-                CheckAxis(group, result, e => e.Geometry.CenterX, "вертикали", axisTolerance);
+                CheckAxis(group, result, "вертикали", axisTolerance);
         }
 
         private bool IsHorizontalGroup(List<UiElement> group)
@@ -158,23 +159,76 @@ namespace UIhub.Analyze.Analyzers
             return ySpread < group.Average(e => e.Bbox.Height);
         }
 
-        private void CheckAxis(List<UiElement> group, AnalysisResult result, Func<UiElement, double> axisSelector, string axisName, int axisTolerance)
+        private void CheckAxis(List<UiElement> group, AnalysisResult result, string axisName, int axisTolerance)
         {
-            var avg = group.Average(axisSelector);
-            var groupLabel = string.Join(", ", group.Select(e => $"#{e.Id}({e.Class})"));
-
-            foreach (var el in group)
+            if (axisName == "горизонтали")
             {
-                var deviation = Math.Abs(axisSelector(el) - avg);
-                if (deviation > axisTolerance)
+                // Проверяем три варианта выравнивания и берём лучший
+                var byTop = group.Select(e => (double)e.Geometry.Top).ToList();
+                var byCenter = group.Select(e => e.Geometry.CenterY).ToList();
+                var byBottom = group.Select(e => (double)e.Geometry.Bottom).ToList();
+
+                var spreadTop = byTop.Max() - byTop.Min();
+                var spreadCenter = byCenter.Max() - byCenter.Min();
+                var spreadBottom = byBottom.Max() - byBottom.Min();
+
+                // Берём вариант с наименьшим разбросом
+                var minSpread = Math.Min(spreadTop, Math.Min(spreadCenter, spreadBottom));
+
+                List<double> bestAlignment;
+                string alignType;
+                if (minSpread == spreadTop) { bestAlignment = byTop; alignType = "верхнему краю"; }
+                else if (minSpread == spreadCenter) { bestAlignment = byCenter; alignType = "центру"; }
+                else { bestAlignment = byBottom; alignType = "нижнему краю"; }
+
+                var avg = bestAlignment.Average();
+                for (int i = 0; i < group.Count; i++)
                 {
-                    result.Items.Add(new AnalysisItem
+                    var deviation = Math.Abs(bestAlignment[i] - avg);
+                    if (deviation > axisTolerance)
                     {
-                        ElementIds = group.Select(e => e.Id).ToList(),
-                        GroupLabel = groupLabel,
-                        Message = $"{ElementClassNames.Translate(el.Class)} не выровнен по {axisName} " +
-                                  $"(отклонение {deviation:F0}px)"
-                    });
+                        result.Items.Add(new AnalysisItem
+                        {
+                            ElementIds = group.Select(e => e.Id).ToList(),
+                            GroupLabel = string.Join(", ", group.Select(e => $"({ElementClassNames.Translate(e.Class)})")),
+                            Message = $"{ElementClassNames.Translate(group[i].Class)} не выровнен по {alignType} " +
+                                      $"(отклонение {deviation:F0}px)"
+                        });
+                    }
+                }
+            }
+            else // вертикали
+            {
+                var byLeft = group.Select(e => (double)e.Geometry.Left).ToList();
+                var byCenter = group.Select(e => e.Geometry.CenterX).ToList();
+                var byRight = group.Select(e => (double)e.Geometry.Right).ToList();
+
+                var spreadLeft = byLeft.Max() - byLeft.Min();
+                var spreadCenter = byCenter.Max() - byCenter.Min();
+                var spreadRight = byRight.Max() - byRight.Min();
+
+                var minSpread = Math.Min(spreadLeft, Math.Min(spreadCenter, spreadRight));
+
+                List<double> bestAlignment;
+                string alignType;
+                if (minSpread == spreadLeft) { bestAlignment = byLeft; alignType = "левому краю"; }
+                else if (minSpread == spreadCenter) { bestAlignment = byCenter; alignType = "центру"; }
+                else { bestAlignment = byRight; alignType = "правому краю"; }
+
+                var avg = bestAlignment.Average();
+                for (int i = 0; i < group.Count; i++)
+                {
+                    var deviation = Math.Abs(bestAlignment[i] - avg);
+                    if (deviation > axisTolerance)
+                    {
+                        result.Items.Add(new AnalysisItem
+                        {
+                            ElementIds = group.Select(e => e.Id).ToList(),
+                            GroupLabel = string.Join(", ", group.Select(e => $"({ElementClassNames.Translate(e.Class)})")),
+                            Message = $"{ElementClassNames.Translate(group[i].Class)} не выровнен по {alignType} " +
+                                      $"(отклонение {deviation:F0}px)"
+                        });
+                    }
                 }
             }
         }

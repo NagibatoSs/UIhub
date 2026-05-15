@@ -24,6 +24,7 @@ namespace UIhub.Analyze.Analyzers
                 Code = Code,
                 Recomendation = recommendation,
                 StandardReference = standardReference,
+                Description = criteria?.Description ?? ""
             };
 
             var menuItems = GetMenuItems(elements);

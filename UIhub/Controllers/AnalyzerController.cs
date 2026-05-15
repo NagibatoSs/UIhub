@@ -198,6 +198,42 @@ namespace UIhub.Controllers
                 }
             }
         }
+        [HttpPost]
+        public IActionResult UpdateCriteria(AnalysisCriteria criteria)
+        {
+            if (!User.Identity.IsAuthenticated)
+            {
+                ViewBag.Message = "Необходима авторизация!";
+                return RedirectToAction("Index");
+            }
+
+            var user = _userManager.FindByIdAsync(_userManager.GetUserId(User)).Result;
+            var roles = _userManager.GetRolesAsync(user).Result;
+
+            if (roles.Contains("admin"))
+            {
+                _criteriaService.Update(criteria);
+                ViewBag.Message = "Справочник обновлён!";
+            }
+            else
+            {
+                ViewBag.Message = "У вас нет прав на совершение данной операции";
+            }
+
+            return RedirectToAction("Criteria");
+        }
+
+        public IActionResult Criteria()
+        {
+            var user = _userManager.FindByIdAsync(_userManager.GetUserId(User)).Result;
+            var roles = user != null ? _userManager.GetRolesAsync(user).Result : new List<string>();
+
+            if (!roles.Contains("admin"))
+                return RedirectToAction("Index");
+
+            var criteria = _criteriaService.GetAll().ToList();
+            return View(criteria);
+        }
 
     }
 }

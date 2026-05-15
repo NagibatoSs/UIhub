@@ -20,7 +20,8 @@ namespace UIhub.Analyze.Analyzers
                 AnalyzerName = name,
                 Code = Code,
                 Recomendation = recommendation,
-                StandardReference = standardReference
+                StandardReference = standardReference,
+                Description = criteria?.Description ?? ""
             };
 
             result.Items = FindIssues(elements);
@@ -77,7 +78,7 @@ namespace UIhub.Analyze.Analyzers
             return new AnalysisMetric
             {
                 Name = name,
-                Value = result.Items.Any() ? $"{result.Items.Count}" : "пересечений нет",
+                Value = result.Items.Any() ? $"{result.Items.Count} нарушений" : "пересечений нет",
                 Threshold = "",
                 IsOk = !result.Items.Any()
             };

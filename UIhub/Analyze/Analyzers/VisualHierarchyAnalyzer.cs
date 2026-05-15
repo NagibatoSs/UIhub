@@ -28,13 +28,14 @@ namespace UIhub.Analyze.Analyzers
                 Code = Code,
                 Recomendation = recommendation,
                 StandardReference = standardReference,
+                Description = criteria?.Description ?? ""
             };
 
             var headers = GetHeadersWithFontSize(elements);
 
             if (headers.Count < 2)
             {
-                result.Metric = BuildMetric(name,true, "нет данных");
+                result.Metric = BuildMetric(name,true, "нарушений нет");
                 return result;
             }
 
@@ -86,22 +87,34 @@ namespace UIhub.Analyze.Analyzers
 
         private void CheckHeaderPair(UiElement prev, UiElement current, bool hasSeparator, AnalysisResult result)
         {
-            if (current.Ocr.FontSize > prev.Ocr.FontSize)
+            if (current.Ocr.FontSize > prev.Ocr.FontSize && !hasSeparator)
             {
+                var shortText = current.Ocr.Text?.Length > 15  
+                    ? current.Ocr.Text.Substring(0, 15) + "..."
+                    : current.Ocr.Text;
+                var shortPrevText = prev.Ocr.Text?.Length > 15
+                    ? prev.Ocr.Text.Substring(0, 15) + "..."
+                    : prev.Ocr.Text;
                 result.Items.Add(new AnalysisItem
                 {
                     ElementIds = new List<int> { prev.Id, current.Id },
-                    Message = $"Заголовок крупнее " +
-                              $"предыдущего ({prev.Ocr.FontSize}px)"
+                    Message = $"Заголовок \"{shortText}\" крупнее " +
+                              $"предыдущего \"{shortPrevText}\" ({prev.Ocr.FontSize}px) и между ними нет контента"
                 });
             }
             else if (current.Ocr.FontSize == prev.Ocr.FontSize && !hasSeparator)
             {
+                var shortText = current.Ocr.Text?.Length > 15
+                    ? current.Ocr.Text.Substring(0, 15) + "..."
+                    : current.Ocr.Text;
+                var shortPrevText = prev.Ocr.Text?.Length > 15
+                    ? prev.Ocr.Text.Substring(0, 15) + "..."
+                    : prev.Ocr.Text;
                 result.Items.Add(new AnalysisItem
                 {
                     ElementIds = new List<int> { prev.Id, current.Id },
-                    Message = $"Заголовок имеет тот же размер " +
-                              $"что и предыдущий - {prev.Ocr.FontSize}px) " +
+                    Message = $"Заголовок \"{shortText}\" имеет тот же размер " +
+                              $"что и предыдущий - \"{shortPrevText}\" ({prev.Ocr.FontSize}px) " +
                               $"и между ними нет контента"
                 });
             }

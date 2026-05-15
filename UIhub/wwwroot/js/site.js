@@ -1,4 +1,11 @@
-﻿function openLightbox(el) {
+﻿
+document.getElementById('analyzeForm')?.addEventListener('submit', function () {
+    const overlay = document.getElementById('loadingOverlay');
+    if (overlay) {
+        overlay.style.display = 'flex';
+    }
+});
+function openLightbox(el) {
     const src = el.getAttribute('data-src');
     const boxes = JSON.parse(el.getAttribute('data-boxes'));
     const origWidth = parseInt(el.getAttribute('data-orig-width'));

@@ -1,90 +1,115 @@
 ﻿@model UIhub.Models.Analysis
 @using UIhub.Models
+@using System.Globalization
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
 
 <a asp-action="OpenUserProfile" asp-route-id="@Model.UserId" class="btn btn-secondary mb-3">← Назад</a>
 <h2>Анализ от @Model.CreatedAt.ToString("dd.MM.yyyy HH:mm")</h2>
 
 @foreach (var file in Model.Files)
 {
-    var displayWidth = Math.Min(file.ImageWidth / 2, 360);
-    var scale = (double)displayWidth / file.ImageWidth;
-    var displayHeight = (int)(file.ImageHeight * scale);
+    var aspectRatio = (double)file.ImageHeight / file.ImageWidth * 100;
+    var isVertical = file.ImageHeight > file.ImageWidth;
+    var containerClass = isVertical ? "analysis-image-container vertical" : "analysis-image-container";
 
     <div class="mb-5">
-        <h5>@file.FileName</h5>
+        <h4>@file.FileName</h4>
 
-        @* Показатели *@
+        @* Результаты анализа *@
         <div class="d-flex align-items-start gap-4 mb-4">
-            <div style="position: relative; width:@(displayWidth)px; height:@(displayHeight)px; cursor:pointer;"
+
+            <div class="@containerClass" style="cursor:pointer;"
                  data-src="@file.FilePath"
                  data-boxes="[]"
                  data-orig-width="@file.ImageWidth"
                  data-orig-height="@file.ImageHeight"
                  onclick="openLightbox(this)">
-                <img src="@file.FilePath"
-                     width="@displayWidth"
-                     height="@displayHeight"
-                     style="display:block; border:1px solid #ddd;" />
-                <div style="position:absolute;bottom:4px;right:4px;background:rgba(0,0,0,0.4);color:white;font-size:11px;padding:2px 6px;border-radius:3px;">
-                    🔍 увеличить
+                <div style="position:relative; padding-top:@(aspectRatio.ToString("F2", CultureInfo.InvariantCulture))%;">
+                    <img src="@file.FilePath"
+                         style="position:absolute; top:0; left:0; width:100%; height:100%; border:1px solid #ddd;" />
+                    <div style="position:absolute;bottom:4px;right:4px;background:rgba(0,0,0,0.4);color:white;font-size:11px;padding:2px 6px;border-radius:3px;">
+                        🔍 увеличить
+                    </div>
                 </div>
             </div>
 
             <div>
-                <h6><strong>Показатели</strong></h6>
-                <ul class="mb-0">
+                <h5><strong>Результаты анализа</strong></h5>
+                <ul class="mb-0" style="list-style:none; padding:0;">
                     @foreach (var criteriaResult in file.Results)
                     {
                         var statusColor = criteriaResult.IsOk ? "text-success" : "text-danger";
-                        var icon = criteriaResult.IsOk ? "✓" : "⚠";
-                        <li class="@statusColor">
+                        <li class="@statusColor mb-1">
+                            @if (criteriaResult.IsOk)
+                            {
+                                <i class="bi bi-check-circle-fill"></i>
+                            }
+                            else
+                            {
+                                <i class="bi bi-exclamation-triangle-fill"></i>
+                            }
                             @criteriaResult.AnalysisCriteria.Name:
                             <strong>@criteriaResult.MetricValue</strong>
-                            @icon
                         </li>
                     }
                 </ul>
             </div>
         </div>
 
-        @* Найденные несоответствия *@
-        <h5 class="mb-3">Найденные несоответствия</h5>
-
-        @foreach (var criteriaResult in file.Results.Where(r => r.Issues.Any()))
+        @* Выявленные проблемы *@
+        @if (file.Results.Any(r => r.Issues.Any()))
         {
-            <div class="d-flex align-items-start gap-4 mb-4">
-                <div style="position: relative; width:@(displayWidth)px; height:@(displayHeight)px; cursor:pointer; flex-shrink:0;"
-                     data-src="@criteriaResult.ResultImagePath"
-                     data-boxes="[]"
-                     data-orig-width="@file.ImageWidth"
-                     data-orig-height="@file.ImageHeight"
-                     onclick="openLightbox(this)">
-                    <img src="@criteriaResult.ResultImagePath"
-                         width="@displayWidth"
-                         height="@displayHeight"
-                         style="display:block; border:1px solid #333;" />
-                    <div style="position:absolute;bottom:4px;right:4px;background:rgba(0,0,0,0.4);color:white;font-size:11px;padding:2px 6px;border-radius:3px;">
-                        🔍 увеличить
+            <h4 class="mb-3">Выявленные проблемы</h4>
+
+            @foreach (var criteriaResult in file.Results.Where(r => r.Issues.Any()))
+            {
+                <div class="d-flex align-items-start gap-4 mb-4">
+
+                    <div class="@containerClass" style="cursor:pointer;"
+                         data-src="@criteriaResult.ResultImagePath"
+                         data-boxes="[]"
+                         data-orig-width="@file.ImageWidth"
+                         data-orig-height="@file.ImageHeight"
+                         onclick="openLightbox(this)">
+                        <div style="position:relative; padding-top:@(aspectRatio.ToString("F2", CultureInfo.InvariantCulture))%;">
+                            <img src="@criteriaResult.ResultImagePath"
+                                 style="position:absolute; top:0; left:0; width:100%; height:100%; border:1px solid #333;" />
+                            <div style="position:absolute;bottom:4px;right:4px;background:rgba(0,0,0,0.4);color:white;font-size:11px;padding:2px 6px;border-radius:3px;">
+                                🔍 увеличить
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="max-width:50%;">
+                        <h5>@criteriaResult.AnalysisCriteria.Name</h5>
+                        <ul class="text-muted mb-1" style="padding-left:1.2rem;">
+                            @foreach (var issue in criteriaResult.Issues)
+                            {
+                                <li>@issue.Message</li>
+                            }
+                        </ul>
+                        @if (!string.IsNullOrEmpty(@criteriaResult.AnalysisCriteria.Description))
+                        {
+                            <p class="text-muted mb-2">@criteriaResult.AnalysisCriteria.Description</p>
+                        }
+                        <h6><strong>Рекомендация</strong></h6>
+                        <p class="mb-1">@criteriaResult.AnalysisCriteria.Recommendation</p>
+                        @if (!string.IsNullOrEmpty(criteriaResult.AnalysisCriteria.StandardReference))
+                        {
+                            <p class="text-muted mb-3" style="font-size:13px">
+                                <em>Стандарты: @criteriaResult.AnalysisCriteria.StandardReference</em>
+                            </p>
+                        }
                     </div>
                 </div>
-
-                <div style="max-width: 620px;">
-                    <h5>@criteriaResult.AnalysisCriteria.Name</h5>
-                    <ul>
-                        @foreach (var issue in criteriaResult.Issues)
-                        {
-                            <li>@issue.Message</li>
-                        }
-                    </ul>
-                    <h6><strong>Рекомендация</strong></h6>
-                    <p class="mb-0 text-muted">@criteriaResult.AnalysisCriteria.Recommendation</p>
-                </div>
-            </div>
+            }
         }
-
-        @if (!file.Results.Any(r => r.Issues.Any()))
+        else
         {
-            <div class="text-success">Нарушений не найдено</div>
+            <div class="text-success mt-2">
+                <i class="bi bi-check-circle-fill"></i> Нарушений не выявлено
+            </div>
         }
     </div>
 }

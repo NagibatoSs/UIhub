@@ -55,6 +55,7 @@
     {
         public string AnalyzerName { get; set; } = string.Empty;
         public AnalysisMetric Metric { get; set; }
+        public string Description { get; set; } = string.Empty;
         public string Recomendation { get; set; } = string.Empty;
         public string StandardReference { get; set; } = string.Empty;
         public List<AnalysisItem> Items { get; set; } = new();

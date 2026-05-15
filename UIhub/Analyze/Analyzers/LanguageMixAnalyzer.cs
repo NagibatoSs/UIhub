@@ -31,6 +31,7 @@ namespace UIhub.Analyze.Analyzers
                 Code = Code,
                 Recomendation = recommendation,
                 StandardReference = standardReference,
+                Description = criteria?.Description ?? ""
             };
 
             var textElements = GetTextElements(elements);
@@ -97,8 +98,14 @@ namespace UIhub.Analyze.Analyzers
 
             foreach (Match m in pattern.Matches(text))
             {
-                if (m.Value.Length >= 2)
-                    mixed.Add(m.Value);
+                if (m.Value.Length < 2) continue;
+
+                // Пропускаем слова которые содержат и кириллицу и латиницу — ошибка OCR
+                bool hasCyrillic = CyrillicPattern.IsMatch(m.Value);
+                bool hasLatin = LatinPattern.IsMatch(m.Value);
+                if (hasCyrillic && hasLatin) continue;
+
+                mixed.Add(m.Value);
             }
 
             return mixed;

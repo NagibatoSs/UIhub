@@ -1,0 +1,52 @@
+﻿@model List<UIhub.Models.AnalysisCriteria>
+
+<h2>Управление справочником критериев</h2>
+<a asp-action="Index" class="btn btn-secondary mb-3">← Назад</a>
+
+@if (ViewBag.Message != null)
+{
+    <div class="alert alert-info">@ViewBag.Message</div>
+}
+
+@foreach (var criteria in Model)
+{
+    <div class="card mb-3">
+        <div class="card-body">
+            <form asp-action="UpdateCriteria" method="post">
+                <input type="hidden" name="Id" value="@criteria.Id" />
+                <input type="hidden" name="Code" value="@criteria.Code" />
+
+                <div class="mb-2">
+                    <label><strong>Код:</strong> @criteria.Code</label>
+                </div>
+
+                <div class="mb-2">
+                    <label>Название</label>
+                    <input type="text" name="Name" value="@criteria.Name" class="form-control" />
+                </div>
+
+                <div class="mb-2">
+                    <label>Описание</label>
+                    <textarea name="Description" class="form-control" rows="2">@criteria.Description</textarea>
+                </div>
+
+                <div class="mb-2">
+                    <label>Рекомендация</label>
+                    <textarea name="Recommendation" class="form-control" rows="2">@criteria.Recommendation</textarea>
+                </div>
+
+                <div class="mb-2">
+                    <label>Пороговое значение</label>
+                    <input type="number" step="0.1" name="ThresholdValue" value="@criteria.ThresholdValue" class="form-control" />
+                </div>
+
+                <div class="mb-2">
+                    <label>Стандарты</label>
+                    <input type="text" name="StandardReference" value="@criteria.StandardReference" class="form-control" />
+                </div>
+
+                <button type="submit" class="btn btn-primary mt-2">Сохранить</button>
+            </form>
+        </div>
+    </div>
+}

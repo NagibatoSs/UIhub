@@ -7,5 +7,6 @@ namespace UIhub.Data
         IEnumerable<AnalysisCriteria> GetAll();
         AnalysisCriteria GetById(int id);
         AnalysisCriteria GetByCode(string code);
+        void Update(AnalysisCriteria criteria);
     }
 }

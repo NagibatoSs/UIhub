@@ -7,9 +7,9 @@ namespace UIhub.Analyze.Analyzers
     {
         public override string Code => "ABBREVIATION";
 
-        // Аббревиатуры - 2+ заглавных букв подряд
+        // Аббревиатуры - 2-5 заглавных букв подряд
         private static readonly Regex AbbreviationPattern =
-            new Regex(@"\b[A-ZА-Я]{2,}\b", RegexOptions.Compiled);
+            new Regex(@"\b[A-ZА-Я]{2,5}\b", RegexOptions.Compiled);
 
         // Сокращения — слово с точкой внутри или в конце (кроме конца предложения)
         private static readonly Regex AbbrevShortPattern =
@@ -34,7 +34,8 @@ namespace UIhub.Analyze.Analyzers
                 AnalyzerName = name,
                 Code = Code,
                 Recomendation = recommendation,
-                StandardReference = standardReference
+                StandardReference = standardReference,
+                Description = criteria?.Description ?? ""
             };
 
             var textElements = elements
@@ -86,7 +87,7 @@ namespace UIhub.Analyze.Analyzers
                 Name = name,
                 Value = value,
                 Threshold = "",
-                IsOk = isOk
+                IsOk = isOk,
             };
         }
     }
